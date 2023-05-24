@@ -1,0 +1,28 @@
+{# ---
+# Parameter:
+human: "string" # Datumsangabe, z. B.: 18.05.2021
+machine: "YYYY-MM-DDThh:mm:ss" # (maschinenlesbarer Zeitstempel) YYYY(Jahr), MM(Monat), DD(Tag), hh(Stunde), mm(Minute), ss(Sekunden)
+text: "string" # (default: "Zuletzt geändert") frei wählbarer Text
+disclaimer: "string" # (wird nur angezeigt, wenn caller() existiert) frei wählbarer Text (default: "Das Datum zeigt die letzte inhaltliche Änderung an. Korrekturen von Grammatik, Rechtschreibung, Formatierung etc. werden nicht als inhaltliche Änderungen gewertet.")
+
+# Anwendung:
+{% from "components/timestamp/timestamp.njk" import timestamp with context %}
+
+{% call timestamp(human = "24.12.2020", machine = "2020-12-24") %}
+  # Wenn caller() existiert, dann ist Inhalt innerhalb Toggle frei wählbar
+{% endcall %}
+--- #}
+
+{% from "components/toggle/toggle.njk" import toggle with context %}
+
+{% macro timestamp(human, machine, text = "Zuletzt geändert", disclaimer = "Das Datum zeigt die letzte inhaltliche Änderung an. Korrekturen von Grammatik, Rechtschreibung, Formatierung etc. werden nicht als inhaltliche Änderungen gewertet.") %}
+  {% if caller() | trim | length > 0 %}
+    {% set toggle_text = text + ":&nbsp;" + "<time datetime=" + machine + ">" + human + "</time>" %}
+    {% call toggle({"text": toggle_text | safe}) %}
+      {{ caller() }}
+      <small>{{ disclaimer }}</small>
+    {% endcall %}
+  {% else %}
+    <p>{{ text }}: <time datetime="{{ machine }}">{{ human }}</time></p>
+  {% endif %}
+{% endmacro %}

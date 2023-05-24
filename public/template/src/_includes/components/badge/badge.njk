@@ -1,0 +1,26 @@
+{# ---
+# Parameter
+type: "string" # Erlaubte Werte: success, error
+class: "string" # CSS Klasse
+attributes: "object" # HTML-Attribute (z. B.: class,...), frei wählbar
+
+# Anwendung
+{% from "components/badge/badge.njk" import badge with context %}
+
+{% call badge(type, attributes)%}
+  Text frei wählbar
+{% endcall %}
+--- #}
+
+{% macro badge(type, attributes, class) %}
+  <span
+    class="wm-badge {{ class }}{% if attributes.class %} {{ attributes.class }}{%- endif -%}{% if type %} wm-badge--{{ type }}{%- endif -%}"
+    {% for attribute, value in attributes %}
+      {% if attribute !== 'class'%}
+        {{ attribute }}{% if value %}="{{ value }}"{% endif %}
+      {% endif %}
+    {% endfor %}
+  >
+    {{ caller() }}
+  </span>
+{% endmacro %}

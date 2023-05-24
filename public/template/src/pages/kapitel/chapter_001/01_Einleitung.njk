@@ -1,0 +1,15 @@
+---
+title: Einleitung
+permalink: /{{ page | parentSlug }}/{{ title | strToSlug }}/index.html
+hide_nav: true
+image1:
+  src: /images/image6.jpeg
+  link: /images/image6.jpeg
+  alt: ""
+  attributes:
+    width: 1440
+    height: 600
+---
+{% from "components/image/image.njk" import image with context %}
+<p>Das Webframework für Berichte der Stadt Wien ist seit 2018 im Einsatz. Seit Sommer 2021 können Webseiten automatisch aus Word-Dokumenten erstellt werden.</p>
+{{ image(image1) }}

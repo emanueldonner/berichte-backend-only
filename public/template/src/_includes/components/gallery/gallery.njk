@@ -1,0 +1,29 @@
+{# ---
+# Parameter gallery(images)
+images: "object, array" # "Array mit Bilder (siehe image.njk)" oder Lighbox (siehe modal.njk)
+
+# Anwendung
+## Die Javascript-Datei "modal.js" muss eingebunden sein
+{% from "components/gallery/gallery.njk" import gallery with context %}
+{% from "components/modal/modal.njk" import modal with context %}
+
+{{ gallery(images) }}
+--- #}
+{% from "components/image/image.njk" import image with context %}
+{% from "components/modal/modal.njk" import modal with context %}
+
+{% macro gallery(images) %}
+  <ul class="wm-gallery" role="list">
+    {% for img in images %}
+      <li>
+        {% if img.modal %}
+          {% call modal(img.modal) %}
+            {{ image(img.image) }}
+          {% endcall %}
+        {% else %}
+          {{ image(img) }}
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+{% endmacro %}

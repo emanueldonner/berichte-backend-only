@@ -1,0 +1,17 @@
+{# ---
+# Parameter
+settings: "object"
+  text: "string" # Bezeichnung
+
+# Anwendung
+{% from "components/toggle-button/toggle-button.njk" import toggleButton with context %}
+
+{{ toggleButton(settings) }}
+--- #}
+
+{% macro toggleButton(settings) %}
+  <div class="wm-toggle-btn" data-wm-toggle-btn>
+    <span id="{{ settings.text | slug }}">{{ settings.text }}</span>
+    <button class="wm-toggle-btn__button" role="switch" aria-checked="false" aria-labelledby="{{ settings.text | slug }}"></button>
+  </div>
+{% endmacro %}

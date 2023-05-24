@@ -1,0 +1,24 @@
+{# ---
+# Anwendung
+{% from "components/notification/notification.njk" import notification with context %}
+
+{% call notification() %}
+  Inhalt frei wählbar
+{% endcall %}
+--- #}
+
+{% from "components/icon/icon.njk" import icon with context %}
+
+{% macro notification() %}
+  <div class="wm-notification js-wm-notification">
+    <div class="wm-section__content wm-notification__content">
+      <button class="wm-notification__button wm-btn--clean js-wm-notification-close">
+        <span class="wm-h-vh">Close</span>
+
+        {{ icon({"id":"close"}) }}
+      </button>
+
+      {{caller() }}
+    </div>
+  </div>
+{% endmacro %}

@@ -1,0 +1,86 @@
+{# ---
+# Parameter list(settings)
+type: "string" # (default: 'ul'), 'ol'
+reset: "boolean" # padding, margin, list-style-type entfernen (default: false)
+spacing: "string" # Margin zwischen lis; Verfügbare Werte: 'xxs' (default: false)
+layout: "string" # Listenstil; Verfügbare Werte: 'row', 'pipe', 'pipe-lg', '2col'
+items: "array" # Listelemente
+  text: "string" # Text
+  url: "string" # Link
+  icon: "object" # Icon Object falls Icon statt Text gezeigt werden soll
+attributes: "object" # HTML-Attribute (z. B.: class: wm-badge--success, wm-badge--error), sonst frei wählbar
+
+# Anwendung
+{% from "components/lists/lists.njk" import list with context %}
+
+{{ list(settings) }}
+
+# Parameter listRowsItem(settings)
+# muss innerhalb eines listRows() Macros aufgerufen werden
+settings: "object"
+  id: "string" # (optional) ID des Icons (siehe /look-and-feel/icons/?icon_cat=uiedv)
+  width: "int" # (optional) Breite
+  height: "int" # (optional) Höhe
+
+# listRows()
+# Wrapper für listRowsItem()
+
+# Anwendung
+{% from "components/lists/lists.njk" import listRows, listRowsItem with context %}
+
+{% call listRows() %}
+  {% call listRowsItem(settings) %}
+    Inhalt frei wählbar
+  {% endcall%}
+{% endcall %}
+--- #}
+
+{% from "components/icon/icon.njk" import icon, iconText with context %}
+
+{% macro list(settings) %}
+  <{{ settings.type | default('ul') }} class="{{ settings.attributes.class }}{% if settings.reset %} wm-list--reset{% endif %}{% if settings.spacing %} wm-list--{{ settings.spacing }}{% endif %}{% if settings.layout %} wm-list--{{ settings.layout }}{% endif %}">
+    {% if settings.items %}
+      {% for item in settings.items %}
+        {{ listItem(item) }}
+      {% endfor %}
+    {% endif %}
+  </{{ settings.type | default('ul') }}>
+{% endmacro %}
+
+{% macro listItem(item) %}
+  <li>
+    {%- if item.url -%}
+      <a href="{{ item.url }}">
+    {%- endif -%}
+      {% if item.icon %}
+        {{ icon(item.icon) }}
+      {% else %}
+        {{ item.text | safe }}
+      {% endif %}
+    {%- if item.url -%}
+      </a>
+    {%- endif -%}
+
+    {% if item.items %}
+      {{ list(item)}}
+    {% endif %}
+  </li>
+{% endmacro %}
+
+{% macro listRows() %}
+  <ul class="wm-list-rows">
+    {{ caller() }}
+  </ul>
+{% endmacro %}
+
+{% macro listRowsItem(settings)%}
+  <li class="wm-list-rows__item">
+    {% if settings %}
+      {% call iconText(settings) %}
+        {{ caller() }}
+      {% endcall %}
+    {% else %}
+      {{ caller() }}
+    {% endif %}
+  </li>
+{% endmacro %}

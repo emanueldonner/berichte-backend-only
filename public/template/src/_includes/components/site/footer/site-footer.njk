@@ -1,0 +1,19 @@
+{# ---
+# Anwendung:
+{% from "components/site/footer/site-footer.njk" import siteFooter with context %}
+
+{% call siteFooter() %}
+  # Footer content
+{% endcall %}
+--- #}
+
+{% macro siteFooter() %}
+  <footer class="wm-site-footer">
+    <div class="wm-section__content">
+      <div class="wm-photo-credits js-wm-photo-credits" hidden>
+        <strong>Foto-Credits:</strong><br>
+      </div>
+      {{ caller() }}
+    </div>
+  </footer>
+{% endmacro %}

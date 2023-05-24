@@ -1,0 +1,6 @@
+{% from "components/site/header/site-header.njk" import siteheader, siteheader_title, siteheader_logo with context %}
+
+{% call siteheader() -%}
+  {{ siteheader_title(title = project.site_title, link = '' | url) }}
+  {{ siteheader_logo(link="https://www.wien.gv.at") }}
+{%- endcall %}

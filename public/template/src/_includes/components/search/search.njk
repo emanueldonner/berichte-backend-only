@@ -1,0 +1,61 @@
+{# ---
+# Parameter
+label: "string" # Label des Sucheingabefeldes (visuell versteckt)
+placeholder: "string" # Placeholder für das Sucheingabefeld
+link: "string" # Fallbacklink für no-JS Variante der Suche
+search_class: "string" # Klasse für Formular (default: wm-site-header__search)
+inline: "boolean" # Suchefeld erst bei Klick sichtbar (default: false)
+static_search: "boolean" # Suchfeld sichtbar in Microsite Nav (default: false)
+search_term: "string" # Klasse für Suchfeld (optional, default: '')
+
+# Anwendung
+{% from "components/search/search.njk" import search with context %}
+
+{% call search(label = 'Suche', placeholder="Seite durchsuchen...", link = '#', inline = true, search_class = '') %}
+  # Suchergebnisse
+{% endcall %}
+--- #}
+
+{% from "components/icon/icon.njk" import icon with context %}
+
+{% macro search(label, placeholder, link, inline, static_search, search_term, search_class= 'wm-site-header__search', hide_search = false) %}
+
+  <form role="search" method="GET" action="{{ link }}" class="wm-site-search js-wm-site-search {% if inline and not static_search %} wm-site-search--inline js-wm-nav-main-search{% elif static_search %} wm-site-search--active wm-site-search--static{% endif %} {{ search_class }} {% if hide_search %} wm-u-dn--no-js wm-u-dn--legacyjs {% endif %}">
+    {% if not static_search  %}
+      {% if inline %}
+        {% set inline_class = "wm-nav-main__search-btn wm-nav-main-btn wm-btn--clean" %}
+      {% endif %}
+      <a href="{{ link }}"
+        class="{% if inline %} {{ inline_class }}{% else %} wm-site-search__toggle wm-site-search-toggle wm-btn--clean {% endif %}"
+        data-wm-site-search-toggle>
+
+        {{ icon({"id": "search", "class": "wm-site-search-toggle__show"}) }}
+        {{ icon({"id": "chevron-left", "class": "wm-site-search-toggle__hide"}) }}
+
+        <span>
+          {{ label }}
+        </span>
+      </a>
+    {% endif %}
+
+    <div class="wm-site-search__content{% if inline %} wm-site-search__content--inline{% endif %}">
+      <label for="site_search" class="wm-h-vh">{{ label }}</label>
+      <input type="text" id="site_search" placeholder="{{ placeholder }}"
+        class="wm-site-search__term js-wm-site-search-term {% if inline %} wm-site-search__term--inline{% endif %}{% if search_term %} {{ search_term }}{% endif %}"
+        autocomplete="off">
+      <button
+        class="wm-site-search__submit wm-btn--clean{% if inline and not static_search %} wm-site-search__submit--hidden{% endif %}" type="submit">
+
+        {{ icon({"id":"search", "class":"wm-icon__search"}) }}
+
+        <span class="wm-h-vh">
+          {{ label }}
+        </span>
+      </button>
+
+      <div class="wm-site-search__results js-wm-search-results">
+        {{ caller() }}
+      </div>
+    </div>
+  </form>
+{% endmacro %}

@@ -1,0 +1,5 @@
+{
+    "name" : "docx",
+    "main" : "./docx.js",
+    "type" : "module"
+}

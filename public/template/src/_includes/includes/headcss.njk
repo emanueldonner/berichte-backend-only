@@ -1,0 +1,12 @@
+{% set suffix = '.min.css?v=' + project.build_time | cacheBust %}
+{% set main = '/assets/' + project.version_folder + '/css/' + 'main' + suffix %}
+{% set main_medium = '/assets/' + project.version_folder + '/css/' + 'main-medium' + suffix %}
+{% set main_large = '/assets/' + project.version_folder + '/css/' + 'main-large' + suffix %}
+{% set print = '/assets/' + project.version_folder + '/css/' + 'print' + suffix %}
+{% set motion = '/assets/' + project.version_folder + '/css/' + 'motion' + suffix %}
+
+<link rel="stylesheet" href="{{ main | url }}" />
+<link rel="stylesheet" href="{{ main_medium | url }}" media="(min-width: 768px)" />
+<link rel="stylesheet" href="{{ main_large | url }}" media="(min-width: 845px)" />
+<link rel="stylesheet" href="{{ print | url }}" media="print" />
+<link rel="stylesheet" href="{{ motion | url}}" media="(prefers-reduced-motion: no-preference)" />

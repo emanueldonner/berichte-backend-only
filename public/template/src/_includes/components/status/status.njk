@@ -1,0 +1,25 @@
+{# ---
+# Parameter
+type: "string" # Erlaubte Werte: success, error, progress
+attributes: "object" # HTML-Attribute (z. B.: class), sonst frei wählbar
+
+# Anwendung
+{% from "components/status/status.njk" import status with context %}
+
+{% call status(type, attributes)%}
+  Inhalt frei wählbar
+{% endcall %}
+--- #}
+
+{% macro status(type, attributes) %}
+  <span
+    class="wm-status {% if attributes.class %} {{ attributes.class }}{%- endif -%}{% if type %} wm-status--{{ type }}{%- endif -%}"
+    {% for attribute, value in attributes %}
+      {% if attribute !== 'class'%}
+        {{ attribute }}{% if value %}="{{ value }}"{% endif %}
+      {% endif %}
+    {% endfor %}
+  >
+    {{ caller() }}
+  </span>
+{% endmacro %}

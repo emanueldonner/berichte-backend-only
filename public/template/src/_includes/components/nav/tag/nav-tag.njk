@@ -1,0 +1,155 @@
+{# ---
+# navTagLink(link, modifiers, attributes, icon_id, icon_title)
+link: "string" # Link des Tags
+modifiers: "array"
+  - "string" # zulässige Werte: amt, no-hover
+attributes: "object" # HTML-Attribute (z. B.: class,...), frei wählbar
+icon_id: "string" # ID des Icons (siehe /look-and-feel/icons/?icon_cat=uiedv)
+icon_title: "string" # Beschreibung des Icons (im jeweiligen Zusammenhang)
+
+{% call navTagLink(link = "#") %}
+  Text frei wählbar
+{% endcall%}
+
+# navTagDropdown(text, link, dropdownLink, id, items)
+text: "string" # Text des Dropdown Tags
+link: "string" # Link des Dropdown Tags
+dropdownLink: "boolean" # Dropdown Tag auch Link als (default: false)
+id: "string" # ID des Dropdown
+items: "array" # Liste der enthaltenen Elemente
+  - text: "string" # Text frei wählbar
+    url: "string" # Link des Elements
+    selected: "boolean" # Option vorausgewählt (default: false)
+
+{% from "components/nav/tag/nav-tag.njk" import navTagDropdown with context %}
+
+{{ navTagDropdown(text, link, dropdownLink, id, items) }}
+
+# navTag(nav, modifiers, items)
+nav: "boolean" # Tags innerhalb eines <nav></nav> darstellen (enthält id und attribute "data-skip-link" für Skiplinks) (default: false)
+modifiers: "array" # Liste von modifiers
+  - "string" # zulässige Werte: no-scroll, scroll
+items: "array" # Liste der Navigation-Tags
+  - text: "string" # Text frei wählbar
+    url: "string" # Link des Tags
+
+{% from "components/nav/tag/nav-tag.njk" import navTag with context %}
+
+{{ navTag(items) }}
+--- #}
+
+{% from "components/icon/icon.njk" import icon with context %}
+
+{% macro navTag(nav = false, modifiers, items) %}
+  {% if nav %}
+    <nav
+      class="wm-nav-tag{% for modifier in modifiers %} wm-nav-tag--{{ modifier }}{% endfor %}"
+      id="tagnav"
+      tabindex="-1"
+      data-skip-link="Meist gesuchte Seiten"
+      aria-label="Meist gesuchte Seiten"
+    >
+  {% endif %}
+
+      <ul
+        class="wm-nav-tag__list{% for modifier in modifiers %} wm-nav-tag__list--{{ modifier }}{% endfor %}"
+      >
+        {% for item in items %}
+          {% call navTagItem() %}
+            {% if item.children %}
+                {{ navTagDropdown(text = item.text, link = item.link, dropdownLink = item.dropdownLink, items = item.children, position = item.position, id = item.id) }}
+            {% else %}
+                {% call navTagLink(link = item.url, hashtag = item.hashtag, modifiers = item.modifiers, attributes = item.attributes, icon_id = item.icon.id, icon_title = item.icon.title) %}
+                  {{ item.text | safe }}
+                {% endcall %}
+            {% endif %}
+          {% endcall %}
+        {% endfor %}
+      </ul>
+
+  {% if nav %}
+    </nav>
+  {% endif %}
+{% endmacro %}
+
+{% macro navTagItem() %}
+  <li class="wm-nav-tag__item">
+    {{ caller() }}
+  </li>
+{% endmacro %}
+
+{% macro navTagLink(link = '#', hashtag = false, modifiers, attributes, icon_id, icon_title) %}
+  <a
+     href="{% if link|length and 'http' in link %}{{ link }}{% elif link|length and hashtag %}
+     #{{ link }}{% else %}{{ link }}{% endif %}"
+    class="wm-nav-tag__link {{ attributes.class }} {% for modifier in modifiers %} wm-nav-tag__link--{{ modifier }}{% endfor %} "
+    {% for attribute, value in attributes %}
+    {% if attribute !== 'class'%}
+      {{ attribute }}{% if value %}="{{ value }}"{% endif %}
+    {% endif %}
+  {% endfor %}
+  >
+    {% if icon_id %}
+      {{ icon({"id": icon_id, "title": icon_title, "width": "24", "class": "wm-nav-tag__icon"}) }}
+    {% endif %}
+
+    {{ caller() }}
+  </a>
+{% endmacro %}
+
+{% macro navTagDropdown(text, link, dropdownLink = false, id, items, position) %}
+  <div
+    class="wm-nav-tag__dropdown {% if position %} wm-nav-tag__dropdown--{{ position }}{% endif %}" data-wm-tag-dropdown="{{ id }}">
+
+    {% call navTagLink(link = link, attributes = {"class": "wm-u-dn--jsm"}) %}
+      {{ text }}
+    {% endcall%}
+
+    {% if dropdownLink %}
+      <span class="wm-nav-tag__link wm-nav-tag__link--no-hover wm-nav-tag__button" data-wm-tag-dropdown-tag>
+        <a href="{{ link }}" class="wm-nav-tag__dropdown-link js-wm-tag-dropdown-button-content">{{ text }}</a>
+
+        <button class="wm-btn--round wm-nav-tag__button-icon-bg" data-label="{{ text }}" aria-label="{{ text }}">
+          {{ icon({"id":"chevron-down", "width":"24"}) }}
+        </button>
+      </span>
+    {% else %}
+      <button
+        class="wm-nav-tag__link wm-nav-tag__button wm-btn--tag wm-btn--clean" data-wm-tag-dropdown-tag
+        data-label="{{ text }}" aria-label="{{ text }}"
+      >
+        <span class="js-wm-tag-dropdown-button-content">
+          {% if text %} {{ text }} {% endif %}
+        </span>
+
+        {{ icon({"id":"chevron-down", "width": "24", "class": "wm-nav-tag__button-icon"}) }}
+      </button>
+    {% endif %}
+
+      <div class="wm-nav-tag__dropdown-listcontainer {% if position %} wm-nav-tag__dropdown-listcontainer--{{ position }}{% endif %} js-wm-tag-dropdown-listcontainer">
+        <ul
+          class="wm-nav-tag__dropdown-list"
+          hidden
+          {% if dropdownLink %} data-storage="{{ id }}" {% endif %}
+        >
+          {% for item in items %}
+            {{ navTagDropdownItem(text = item.text, url = item.url, selected = item.selected, attributes = item.attributes)}}
+          {% endfor %}
+        </ul>
+      </div>
+  </div>
+{% endmacro %}
+
+{% macro navTagDropdownItem(text, url = '#', selected = false, attributes) %}
+    <li
+      id="{{ text|slug }}"
+
+      {% for attribute, value in attributes %}
+        {{ attribute }}{% if value %}="{{ value }}"{% endif %}
+      {% endfor %}
+    >
+      <a href="{{ url }}" class="wm-nav-tag__dropdown-item wm-link--unstyled" {% if selected %} aria-current="page" {% endif %}>
+        {{ text }}
+      </a>
+    </li>
+{% endmacro %}

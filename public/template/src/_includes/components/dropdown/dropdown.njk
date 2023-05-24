@@ -1,0 +1,57 @@
+{# ---
+# Parameter
+settings: "object"
+  button: "object" # Siehe Button
+    content: "string" Button text
+    attributes: "object"
+      data-wm-dropdown: "Boolean" # Macht den Button zum Dropdown
+      data-wm-dropdown-class: "string" # Zusätzliche, optionale Klasse für den Dropdown-Content
+      data-wm-dropdown-position: "string" # Dropdown links oder rechts darstellen, Zulässige Werte: right
+    icon: "object" # Siehe Icons
+
+{% from "components/dropdown/dropdown.njk" import dropdown with context %}
+
+# Anwendung
+{% call dropdown(buttons_settings, dropdown_settings) %}
+  Inhalt
+{% endcall %}
+--- #}
+{% from "components/button/button.njk" import button with context %}
+{% from "components/icon/icon.njk" import icon with context %}
+
+{% macro dropdown(buttonSettings, list) %}
+ <div class="wm-dropdown js-wm-dropdown">
+    {% call button(buttonSettings) %}
+      {{ buttonSettings.content }}
+    {% endcall %}
+
+    <div class="wm-dropdown__content">
+      {% set position = buttonSettings.attributes['data-wm-dropdown-position'] %}
+      {% if list %}
+        <ul class="wm-dropdown__list wm-list--reset">
+          {% for item in list %}
+            <li>
+              <a href="{{ item.url }}" class="wm-dropdown__link {% if position %} wm-dropdown__link--{{ position }}{% endif %}">
+                {% if position !== 'right' %}
+                  {% if item.icon %}
+                    {{ icon({id: item.icon, width: 22, height: 22 }) }}
+                  {% endif %}
+                {% endif %}
+
+                <span>{{ item.text }}</span>
+
+                {% if position === 'right' %}
+                  {% if item.icon %}
+                    {{ icon({id: item.icon, width: 22, height: 22 }) }}
+                  {% endif %}
+                {% endif %}
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+
+      {{ caller() }}
+    </div>
+  </div>
+{% endmacro %}

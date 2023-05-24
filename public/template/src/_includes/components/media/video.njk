@@ -1,0 +1,67 @@
+{# ---
+# Parameter
+settings: "object"
+  files: "array" # Liste der Video Dateien (wenn vorhanden: webm und mp4 angeben)
+    - src: "string" # Pfad des internen Videos
+      type: "string" # zulässige Werte: video/mp4, video/webm
+  autoplay: "boolean" # spielt automatisch ab (default: false)
+  muted: "boolean" # spielt mit Lautstärke ab (default: false)
+  controls: "boolean" # Controls anzeigen (default: false)
+  loop: "boolean" # spielt in Schlaufe ab (default: false)
+  poster: "string" # (Wichtig: sollte immer vorhanden sein) Pfad des Posterbildes
+  class: "string" # CSS-Klassen
+  link: "string" # (nur bei externen Video) Pfad des extern eingebundenen Videos
+  label: "string" # Label des Videos frei wählbar
+  description: "string" # wenn vorhanden -> Video innerhalb einer <figure></figure> mit <figcaption> description frei wählbar </figcaption>
+
+# Anwendung
+{% from "components/media/video.njk" import video with context %}
+
+{{ video(settings) }}
+--- #}
+
+{% from "components/figure/figure.njk" import figure with context %}
+
+{% macro video(settings) %}
+  {% if settings.description %}
+    {% call figure(settings) %}
+      {{ videoWrapper(settings) }}
+    {% endcall%}
+  {% else %}
+    {{ videoWrapper(settings) }}
+  {% endif %}
+{% endmacro %}
+
+{% macro videoWrapper(settings) %}
+  {% if settings.files %}
+    {{ videoInternal(settings) }}
+  {% else %}
+    {{ videoExternal(settings) }}
+  {% endif %}
+{% endmacro %}
+
+{% macro videoInternal(settings) %}
+  <video
+    playsinline
+    {% if settings.autoplay %} autoplay {% endif %}
+    {% if settings.muted %} muted {% endif %}
+    {% if settings.loop %} loop {% endif %}
+    {% if settings.controls %} controls {% endif %}
+    {% if settings.poster %} poster="{{settings.poster}}" {% endif %}
+    {% if settings.class %} class="{{ settings.class }}"{% endif %}>
+      {% for file in settings.files %}
+        <source src="{{ file.src | url }}" type="{{ file.type }}">
+      {% endfor %}
+    </video>
+{% endmacro %}
+
+
+{% macro videoExternal(settings) %}
+  <div class="wm-media-wrapper wm-media-wrapper--video">
+    <iframe allowfullscreen scrolling="auto" loading="lazy" data-src="{{ settings.link }}" title="{{ settings.label }}">
+      <a href="{{ settings.link }}">
+        {{ settings.label }}
+      </a>
+    </iframe>
+  </div>
+{% endmacro %}

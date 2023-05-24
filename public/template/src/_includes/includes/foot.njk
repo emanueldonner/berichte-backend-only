@@ -1,0 +1,39 @@
+{% set mainJS = '/assets/' + project.version_folder + '/js/main.min.js' %}
+{% set siteJS = '/assets/' + project.version_folder + '/js/components/site.min.js' %}
+<script src="{{ mainJS | url }}"></script>
+<script src="{{ siteJS | url }}" type="module" crossorigin="use-credentials"></script>
+
+{%- if chatbot -%}
+  {%- from "components/chatbot/chatbot.njk" import chatbot with context -%}
+  {{ chatbot(settings) }}
+{%- endif -%}
+
+{% if project.environment !== 'development' and project.siteimprove %}
+  <script>
+  (function () {
+      var sz = document.createElement('script')
+      sz.type = 'text/javascript'
+      sz.async = true
+      sz.src = '//siteimproveanalytics.com/js/siteanalyze_6002359.js'
+      var s = document.getElementsByTagName('script')[0]
+      s.parentNode.insertBefore(sz, s)
+  })()
+  </script>
+{% endif %}
+
+<script type="module" crossorigin="use-credentials">
+  {% set searchPath = "/assets/"+ project.version_folder +"/js/components/search.min.js" %}
+  import { siteSearch } from '{{ searchPath | url }}'
+  document.querySelector('[data-wm-nav-main-wrapper]').classList.remove('wm-nav-wrapper--init')
+  siteSearch({
+    database: '{{ "/search.json" | url }}',
+    url: '{{ "/suche"| url }}',
+    msgs: {
+      showing: "Seite $1 von $2.",
+      noresult: "Es wurden keine Ergebnisse mit „$1“ gefunden. "
+    },
+    resultTypes: {
+      "page": "Top-Treffer"
+    }
+  })
+</script>

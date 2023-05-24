@@ -1,0 +1,83 @@
+{# ---
+# Parameter image(settings)
+settings: "object"
+  src: "string" # Pfad des Bildes
+  alt: "string" # alternative Bildbeschreibung (muss angegeben werden!)
+  display_size: "string" # (optional) Wert (z. B.: 170px) für Attribut "sizes" -> steuert width des Bildes
+  link: "string" # (optional) Pfad zu großem Bild
+  class: "string" # (optional) CSS Klasse
+  attributes: "object" # HTML-Attribute (z. B.: width, height, class,...), frei wählbar
+    width: "int" # Breite (sollte angegeben werden)
+    height: "int" # Höhe (sollte angegeben werden)
+    title: "string" # Title des Bildes frei wählbar, kann verwendet werden für Quellenverweise (copyright: )
+  not_lazy: "boolean" # (optional, default: false), true -> Bild nicht lazy laden
+  sizes: "array" # (optional) Pfade und Größen für Attribut "srcset" müssen in absteigender Reihenfolge angegeben werden.
+    - url: "string" # Pfad des Bildes
+      size: "int" # media(min-width) ab welcher Fenstergröße Bild geladen wird
+  sources: "array" # (optional) Pfade und Größen für Element "picture" müssen in absteigender Reihenfolge angegeben werden. Wenn unterschiedliche Formate (1. avif, 2. webp) verwendet werden -> müssen in dieser Reihenfolge angegeben werden.
+    - url: "string" # Pfad des Bildes
+      url_retina: "string" # (optional) Pfad zum Retina-Bild
+      size: "int" # media(min-width) ab welcher Fenstergröße Bild geladen wird
+
+# Anwendung
+{% from "components/image/image.njk" import image with context %}
+
+{{ image(settings) }}
+--- #}
+{% macro image(settings) %}
+  {% if settings.sources %}
+    <picture>
+      {% for source in settings.sources %}
+        {% set parts = source.url | split('.') %}
+        <source type="image/{{ parts[parts | length - 1] }}" {% if settings.not_lazy %}srcset{% else %}data-srcset{% endif %}="{{ source.url | url }}{% if source.url_retina %} 1x, {{ source.url_retina | url }} 2x{% endif %}" {% if source.size %} media="(min-width: {{ source.size }}px)" {% endif %}>
+      {% endfor %}
+
+      {{ imageWrapper(settings) }}
+    </picture>
+  {% else %}
+    {{ imageWrapper(settings) }}
+  {% endif %}
+{% endmacro %}
+
+{% macro imageWrapper(img) %}
+  {% set src = img.src %}
+  {% set alt = img.alt %}
+  {% set spacer = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==' %}
+
+  {% if img.src == 'empty' %}
+    {% set src = spacer %}
+    {% set alt = '' %}
+  {% endif %}
+
+  {% if img.not_lazy %}
+    <img
+      {% for attribute, value in img.attributes %}
+        {% if attribute !== 'class'%}
+          {{ attribute }}{% if value %}="{{ value }}"{% endif %}
+        {% endif %}
+      {% endfor %}
+
+      src="{{ src | url }}"
+      alt="{{ alt }}"
+      {% if img.sizes %} srcset="{% for image in img.sizes %}{{ image.url | url }} {{ image.size }}w{% if not loop.last %}, {% endif %}{% endfor %}"{% endif %}
+      {% if img.display_size %}sizes="{{ img.display_size }}"{% endif %}
+      class="wm-image js-wm-image {{ img.attributes.class }} {{ img.class }} {% if img.style %}wm-image--{{ img.style }}{% endif %}"
+    />
+  {% else %}
+    <img class="wm-image {% if img.style %}wm-image--{{ img.style }}{% endif %} {{ img.attributes.class }} {{ img.class }}" loading="lazy" src="{{ spacer }}" {% for attribute, value in img.attributes %}
+      {{ attribute }}="{{value }}"
+    {% endfor %}
+    {% if img.sizes %} data-srcset="{% for image in img.sizes %}{{ image.url | url }} {{ image.size }}w{% if not loop.last %}, {% endif %}{% endfor %}"{% endif %}
+    {% if img.display_size %}sizes="{{ img.display_size }}"{% endif %}
+    data-src="{{ src | url }}"
+    alt="{{ alt }}">
+    <noscript>
+      <img class="{{ img.attributes.class }} {{ img.class }} {% if img.style %}wm-image--{{ img.style }}{% endif %}" {% for attribute, value in img.attributes %}
+        {{ attribute }}="{{value }}"
+      {% endfor %}
+
+      src="{{ src | url }}"
+      alt="{{ alt }}">
+    </noscript>
+  {% endif %}
+{% endmacro %}

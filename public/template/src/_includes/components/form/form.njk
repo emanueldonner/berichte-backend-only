@@ -1,0 +1,241 @@
+{# ---
+# Parameter form(id, method, action, class, inline)
+id: "string" # ID des Formulars
+method: "string" # Method des Formulars; zulässige Werte GET, POST
+action: "string" # Action des Formulars
+class: "string" # CSS Klassen
+inline: "Boolean" # Formularelemente nebeneinander darstellen (default: false)
+
+# Parameter input(settings)
+settings: "object"
+  id: "string" # ID des Inputfelds
+  label: "object" # Label des Inputfelds
+    text: "string" # Labeltext frei wählbar
+    no_label: "boolean" # (default: false) bei true ist Label nicht sichtbar (Achtung: Barrierefreiheit)
+  type: "string" # Typ des Inputfelds. Zulässige Werte: password, text, tel, url, date, time, email
+  name: "string" # Name des Inputfelds
+  message: "object"
+    text: "string" # Text frei wählbar (für Fehler- oder Hinweistext)
+    type: "string" # zulässige Werte: (default: error), hint
+  value: "string" # Wert des Inputfelds
+  rows: "int" # Bei Angabe, wird statt eines Inputfeldes ein Textfeld mit der entsprechenden Größe erzeugt
+  attributes: "object" # optionale Attribute
+    placeholder: "string" # Frei wählbar
+    aria-invalid: "boolean" # bei true -> wird das Feld invalide (border-color: siehe /look-and-feel/farben/#ui-farben -> Fehler)
+    required: "boolean" # bei true -> wird als Pflichtfeld dargestellt
+
+# Parameter radioCheckbox(settings)
+settings: "object"
+  id: "string" # ID des Inputfelds
+  label: "object" # Label des Inputfelds
+    text: "string" # Labeltext frei wählbar
+  name: "string" # Name des Inputfelds
+  value: "string" # Wert des Inputfelds
+  type: "string" # Typ der Checkbox. Zulässige Werte: radio, checkbox
+  message: "object"
+    text: "string" # Text frei wählbar (für Fehler- oder Hinweistext)
+    type: "string" # zulässige Werte: (default: error), hint
+  attributes: "object"
+    checked: "boolean" # (default: false)
+
+# Parameter select(settings)
+settings: "object"
+  id: "string" # ID der Selektbox
+  label: "object" # Label der Selectbox
+    text: "string" Labeltext frei wählbar
+    no_label: "boolean" # (default: false) bei true ist Label nicht sichtbar (Achtung: Barrierefreiheit)
+  message: "object"
+    text: "string" # Text frei wählbar (für Fehler- oder Hinweistext)
+    type: "string" # zulässige Werte: (default: error), hint
+  items: "array"
+    - value: "string" # Wert der jeweiligen Option frei wählbar
+      text: "string" # Text frei wählbar
+  attributes: "object"
+    required: "boolean" # bei true -> wird als Pflichtfeld dargestellt
+
+# Parameter range(settings)
+settings: "object"
+  id: "string" # ID frei wählbar
+  label: "object" # Label frei wählbar
+  initialValue: "int" # (default: 1) zwischen minVal (Startwert) und maxVal (Endwert)
+  minValue: "int" # (default: 1) frei wählbar
+  maxValue: "int" # (default: 2) frei wählbar
+  stepSize: "int" # (default: 0.1) frei wählbar. Zählwert (Größe der Schritte) zwischen minVal und maxVal
+
+# Anwendung:
+{% from "components/form/form.njk" import form, input, select, radioCheckbox, range with context %}
+## Die Javascript-Datei "forms.js" muss eingebunden sein.
+
+{% call form(id = "form_id", method, action) %}
+  {{ input(settings) }}
+  {{ range(settings) }}
+  {{ select(settings) }}
+  {{ radioCheckbox(settings) }}
+{% endcall %}
+--- #}
+
+{% macro form(id, method = "GET", action = "#", class, inline = false) %}
+  <form id="{{ id }}" method="{{ method }}" action="{{ action }}" class="wm-form {{ class }}{% if inline %} wm-form--inline{% endif %}">
+    {{ caller() }}
+  </form>
+{% endmacro %}
+
+{% macro input(settings) %}
+  <div>
+    {{ formLabel(settings) }}
+    {% if settings.rows %}
+      <textarea
+      {% if settings.attributes.class %}class="{{ settings.attributes.class }}"{% endif %}
+        id="{{ settings.id }}"
+        rows="{{ settings.rows }}"
+        name="{{settings.name}}"
+        {% if settings.message %}aria-describedby="msg_{{ settings.id }}"{% endif %}
+
+        {% for attribute, value in settings.attributes %}
+          {% if attribute !== 'class'%}
+            {{ attribute }}{% if value %}="{{ value }}"{% endif %}
+          {% endif %}
+        {% endfor %}
+      >{% if settings.text %}{{ settings.text }}{% endif %}</textarea>
+
+    {% else %}
+      <input
+        type="{{settings.type}}"
+        name="{{settings.name}}"
+        id="{{ settings.id }}"
+        {% if settings.autocomplete %}autocomplete="{{ settings.autocomplete }}"{% endif %}
+        {% if settings.message %}aria-describedby="msg_{{ settings.id }}"{% endif %}
+
+        {% for key, value in settings.attributes %}
+           {{ key }}="{{value}}"
+        {% endfor %}
+      />
+    {% endif %}
+
+    {% if settings.message %}
+      {{ message(settings.message, settings.id) }}
+    {% endif %}
+
+  </div>
+{% endmacro %}
+
+{% macro radioCheckbox(settings) %}
+  <div {% if settings.attributes.class %}class="{{ settings.attributes.class }}"{% endif %}>
+
+  <input
+    type="{{ settings.type }}"
+    name="{{ settings.name }}"
+    id="{{ settings.id }}"
+    value="{{ settings.value }}"
+    class="wm-h-vh"
+    {% if settings.message %}aria-describedby="msg_{{ settings.id }}"{% endif %}
+
+    {% for key, value in settings.attributes %}
+        {{ key }}="{{value}}"
+    {% endfor %}
+  />
+
+   {{ formLabel(settings) }}
+
+  {% if settings.message %}
+    {{ message(settings.message, settings.id) }}
+  {% endif %}
+
+  </div>
+{% endmacro %}
+
+{% macro formLabel(settings) %}
+  {% set styles = [] %}
+
+  {% if settings.type == 'radio' %}
+    {% set styles = styles | push('radio') %}
+  {% endif %}
+
+  {% if settings.type == 'checkbox' %}
+    {% set styles = styles | push('radio') %}
+  {% endif %}
+
+  {% if settings.message.type == 'error' %}
+    {% set styles = styles | push('error') %}
+  {% endif %}
+
+  <label
+    class="wm-form-label
+    {%- for style in styles %}
+      wm-form-label--{{ style }}
+    {% endfor -%}
+    {% if settings.label.no_label %} wm-h-vh{%- endif -%}"
+    for="{{ settings.id }}"
+  >
+
+    <span {% if settings.label.class %}class="{{ settings.label.class }}"{% endif %}>
+      {{ settings.label.text | safe}}
+
+      {% for key, value in settings.attributes %}
+        {% if key == 'required' %}
+          <abbr title="Pflichtfeld">*</abbr>
+        {% endif %}
+      {% endfor %}
+    </span>
+
+
+  </label>
+{% endmacro %}
+
+{% macro select(settings) %}
+  <div>
+
+    {{ formLabel(settings) }}
+
+    <select
+      id="{{ settings.id }}"
+      {% if settings.message %}aria-describedby="msg_{{ settings.id }}"{% endif %}
+
+      {% for key, value in settings.attributes %}
+          {{ key }}="{{value}}"
+      {% endfor %}
+    >
+
+      {% for item in settings.items %}
+        <option
+          {% if item.selected %}selected{% endif %}
+          value="{{ item.value }}"
+        >
+          {{ item.text }}
+        </option>
+      {% endfor %}
+    </select>
+
+    {% if settings.message %}
+      {{ message(settings.message) }}
+    {% endif %}
+
+  </div>
+{% endmacro %}
+
+{% macro message(settings, id) %}
+    <div class="wm-form-message wm-form-message--{{ settings.type | default('error') }}" id="msg_{{ id }}">{{ settings.text }}</div>
+{% endmacro %}
+
+
+{% macro range(settings) %}
+  <div>
+    <label for="{{settings.id}}">{{settings.label}}</label>
+
+    <div class="wm-form-range js-wm-range--container">
+      <button class="wm-form-range__button" data-calc="-" hidden>
+        <span class="wm-h-vh">weniger</span>
+        <span aria-hidden="true">&minus;</span>
+      </button>
+
+      <input type="range" value="{{settings.initialValue | default("1") }}" id="{{settings.id}}" min="{{settings.minValue | default("1")}}" max="{{settings.maxValue | default("2")}}" step="{{settings.stepSize | default("0.1")}}" class="js-wm-range wm-form-range__input"
+      {% if settings.message %}aria-describedby="msg_{{ settings.id }}"{% endif %}
+      >
+
+      <button class="wm-form-range__button" data-calc="+" hidden>
+        <span class="wm-h-vh">mehr</span>
+        <span aria-hidden="true">&plus;</span>
+      </button>
+    </div>
+  </div>
+{% endmacro %}

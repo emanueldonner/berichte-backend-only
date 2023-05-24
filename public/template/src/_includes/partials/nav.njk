@@ -1,0 +1,37 @@
+{% from "components/nav/main/nav-main.njk" import navlist with context %}
+
+{% set nav_items = [] %}
+{# Über alle chapter aus chapers.json gehen und erste Ebende der Navigation bauen #}
+{% for chapter in chapters %}
+  {# Object mit den Kindelemente #}
+  {% set supchapters = collections["chapter_0" + loop.index0]  %}
+  {% set nav_subitems = [] %}
+
+  {# Über collection pro Chapter gehen und die zweite Ebene bauen #}
+  {% for subchapter in supchapters %}
+   {% set nav_subitem = {
+    "data": {
+      "title": subchapter.data.title
+    },
+    "url": subchapter.url
+    } 
+    %}
+    {% set nav_subitems = (nav_subitems.push(nav_subitem), nav_subitems) %}
+  {% endfor %}
+  
+  {# Alle Ebenen zusammenführen und Navigationsobject erstellen #}
+  {% set nav_item = {
+    "data": {
+      "title": chapter.title
+    },
+    "url": supchapters[0].url,
+    "children": nav_subitems
+    } 
+  %}
+
+  {% set nav_items = (nav_items.push(nav_item), nav_items) %}
+{% endfor %}
+
+{% set nav_data = { "default": nav_items } %}
+
+{{ navlist(nav_data['default']) }}

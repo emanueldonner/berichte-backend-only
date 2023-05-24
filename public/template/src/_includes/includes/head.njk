@@ -1,0 +1,92 @@
+{% set page_title = title + " - " + project.site_title %}
+
+{% if page.url != '/' %}
+  {% set page_title = project.site_title %}
+{% endif %}
+
+{% set page_description = description or project.site_description %}
+{% set sm_image = project.site_url + project.sm_image | url %}
+
+<meta charset="UTF-8">
+
+<title>{{ page_title | safe }}</title>
+
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta name="description" content="{{ page_description }}">
+
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:description" content="{{ page_description }}">
+<meta property="og:title" content="{{ page_title }}">
+<meta property="og:image" content="{{ sm_image }}">
+<meta property="og:url" content="{{ project.site_url }}{{ project.site_base_path }}">
+
+<meta name="image" content="{{ sm_image }}">
+
+<meta itemprop="name" content="{{ page_title }}">
+<meta itemprop="description" content="{{ page_description }}">
+<meta itemprop="image" content="{{ sm_image }}">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ page_title }}">
+<meta name="twitter:description" content="{{ page_description }}">
+{% if sm_twitterhandle %}
+<meta name="twitter:site" content="{{ sm_twitterhandle }}">
+<meta name="twitter:creator" content="{{ sm_twitterhandle }}">
+{% endif %}
+<meta name="twitter:image:src" content="{{ sm_image }}">
+
+<!-- Open Graph general (Facebook, Pinterest & Google+) -->
+<meta property="og:title" content="{{ page_title }}">
+<meta property="og:description" content="{{ page_description }}">
+<meta property="og:image" content="{{ sm_image }}">
+<meta property="og:url" content="{{ project.site_url }}{{ project.site_base_path }}">
+<meta property="og:site_name" content="{{ project.site_title }}">
+<meta property="og:locale" content="{{ project.site_lang }}">
+<meta property="og:type" content="website">
+
+<link rel="apple-touch-icon" sizes="180x180" href="{{ project.site_asset_path }}/favicon/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="{{ project.site_asset_path }}/favicon/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="{{ project.site_asset_path }}/favicon/favicon-16x16.png">
+<link rel="manifest" href="{{ project.site_base_path }}site.webmanifest">
+<link rel="mask-icon" href="{{ project.site_asset_path }}/favicon/safari-pinned-tab.svg" color="#FF0000">
+<link rel="shortcut icon" href="{{ project.site_asset_path }}/favicon/favicon.ico">
+<meta name="msapplication-TileColor" content="{{ project.sm_tilecolor }}">
+<meta name="theme-color" content="{{ project.webmanifest_theme_color }}">
+{% set url = canonical or page.url %}
+{% set canonical = project.site_url + project.site_base_path + url %}
+<link rel="canonical" href="{{ canonical | replace('//', '/') }}" />
+
+<link rel="stylesheet" href="{{ project.site_asset_path }}/assets/fonts/melange-1.6.css" />
+<link rel="stylesheet" href="{{ project.site_asset_path }}/assets/css/vendor/tiny-slider-1.0.0.min.css?v={{ project.buildTime | cacheBust }}" />
+
+<link rel="stylesheet" href="{{ project.site_asset_path }}/assets/css/main-1.0.0.min.css?v={{ project.buildTime | cacheBust }}" />
+<link rel="stylesheet" href="{{ project.site_asset_path }}/assets/css/main-medium-1.0.0.min.css?v={{ project.buildTime | cacheBust }}" media="(min-width: 768px)" />
+<link rel="stylesheet" href="{{ project.site_asset_path }}/assets/css/main-large-1.0.0.min.css?v={{ project.buildTime | cacheBust }}" media="(min-width: 845px)" />
+<link rel="stylesheet" href="{{ project.site_asset_path }}/assets/css/print-1.0.0.min.css?v={{ project.buildTime | cacheBust }}" media="print" />
+<style>
+  .wm-tabs__list {
+    margin: 0 !important;
+  }
+</style>
+
+<meta name="robots" content="noindex, nofollow" />
+
+<script>document.documentElement.classList.remove('no-js');document.documentElement.classList.add('js-legacy');</script>
+<script type="module" crossorigin="use-credentials">document.documentElement.classList.add('js');</script>
+<script>
+  (function(w){var loadJS=function(src,cb,ordered){"use strict";var tmp;var ref=w.document.getElementsByTagName("script")[0];var script=w.document.createElement("script");if(typeof cb==="boolean"){tmp=ordered;ordered=cb;cb=tmp}script.src=src;script.async=!ordered;ref.parentNode.insertBefore(script,ref);if(cb&&typeof cb==="function"){script.onload=cb}return script};if(typeof module!=="undefined"){module.exports=loadJS}else{w.loadJS=loadJS}})(typeof global!=="undefined"?global:this);
+
+  if (!window.HTMLPictureElement) {
+    // Picture element HTML5 shiv
+    document.createElement( "picture" );
+    loadJS( "{{ project.site_asset_path }}/assets/js/polyfill/picturefill.min.js");
+    loadJS( "{{ project.site_asset_path }}/assets/js/polyfill/svgxuse.js");
+  }
+
+  if (localStorage.getItem('notification')) {
+    document.documentElement.classList.add('no-notification')
+  }
+</script>

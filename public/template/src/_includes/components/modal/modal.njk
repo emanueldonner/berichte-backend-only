@@ -1,0 +1,53 @@
+{# ---
+# Parameter modal(settings)
+settings:
+  link: "string" # Pfad zu Inhalt
+  group: "string" # Frei wählbarer String, der Modalelemente gruppiert
+  html: "string" # Selector für Element, dessen Inhalt im Modal angezeigt werden soll
+  type: "string" # Legt fest wie das Modal dargestellt wird (image, video, audio, page, html)
+  hidden: "Boolean" # Link verbergen
+  ajax: "Boolean" # Lade Daten aus Link mittels fetch()
+  class: "string" # CSS Klassenname
+  attributes: "object" # HTML-Attribute für den Link (z. B.: width, height, class,...), frei wählbar
+  width: "string" # Optionale Maximalbreite für das Modal
+  height: "string" # Optionale Maximalhöhe für das Modal
+
+# Anwendung
+## Die Javascript-Datei "modal.js" muss eingebunden sein
+{% from "components/modal/modal.njk" import modal with context %}
+
+{% call modal(settings) %}
+  Link-Text
+{% endcall %}
+--- #}
+
+{% macro modal(settings) %}
+  {% if settings.link %}
+    <a href="{{ settings.link | url }}" class="{{ settings.class or settings.attributes.class }} {{ settings.selector | replace('.', '') or 'js-wm-modal' }} {% if settings.hidden %}wm-u-dn--jsm{% endif %}"
+    data-wm-modal="{{ settings.type or 'image' }}"
+    {% if settings.width %}data-wm-modal-width="{{ settings.width }}"{% endif %}
+    {% if settings.height %}data-wm-modal-height="{{ settings.height }}"{% endif %}
+    {% if settings.group %}data-wm-modal-group="{{ settings.group }}"{% endif %}
+
+    {% for attribute, value in settings.attributes %}
+      {% if attribute !== 'class'%}
+        {{ attribute }}{% if value %}="{{ value }}"{% endif %}
+      {% endif %}
+    {% endfor -%}>
+      {{- caller() -}}
+    </a>
+  {% else %}
+    <button class="{{ settings.class or settings.attributes.class }} {{ settings.selector | replace('.', '') or 'js-wm-modal' }}"
+    {% if settings.width %}data-wm-modal-width="{{ settings.width }}"{% endif %}
+    {% if settings.height %}data-wm-modal-height="{{ settings.height }}"{% endif %}
+    {% if settings.group %}data-wm-modal-group="{{ settings.group }}"{% endif %}
+    {% if settings.hidden %}hidden{% endif %}
+    {% for attribute, value in settings.attributes %}
+      {% if attribute !== 'class'%}
+        {{ attribute }}{% if value %}="{{ value }}"{% endif %}
+      {% endif %}
+    {% endfor -%}>
+      {{- caller() -}}
+    </button>
+  {% endif %}
+{% endmacro %}

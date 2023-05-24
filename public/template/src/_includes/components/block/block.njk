@@ -1,0 +1,23 @@
+{# ---
+# Parameter block(size, richText = false, class, attributes)
+size: "string" # Zulässige Werte: large
+richText: "Boolean" # wm-rich-text vergeben oder nicht
+class: "string" # Klassen
+attributes: "object" # HTML-Attribute (z. B.: width, class,...), frei wählbar (optional)
+
+# Anwendung block()
+{% from "components/block/block.njk" import block with context %}
+
+{% call block() %}
+  Inhalt frei wählbar
+{% endcall %}
+
+--- #}
+
+{% macro block(size, richText = false, class, attributes) %}
+  <div class="wm-block {% if size %}wm-block--{{ size }}{% endif %}{% if richText == true %} wm-rich-text{% endif %} {{ class }}" {%- for attribute, value in attributes -%}
+        {% if attribute !== 'class' %} {{ attribute }}{% if value %}="{{ value }}"{% endif %}{%- endif -%}
+      {%- endfor -%}>
+    {{ caller() }}
+  </div>
+{% endmacro %}

@@ -1,0 +1,10 @@
+{% if project.navbar.search %}
+  {% set static_search = true %}
+
+  {% if project.navbar.search == 'hidden' %}
+    {% set static_search = false %}
+  {% endif %}
+  
+  {% from "components/search/search.njk" import search with context %}
+  {% call search(label = 'Suche', placeholder="Suche", link = '#', inline = 'true',  search_class= 'wm-site-header__search', hide_search = true, static_search = static_search, search_class='') %}{% endcall %}
+{% endif %}

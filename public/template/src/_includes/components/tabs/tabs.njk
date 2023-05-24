@@ -1,0 +1,49 @@
+{# ---
+# Parameter tabs(items, id)
+items: "array" # Liste der Tabs (Anzahl muss mit tabContent Anzahl übereinstimmen)
+  - title: "string" # Tab Titel frei wählbar
+    active: "boolean" # setzt aktiven Tab
+    class: "string" # add class to tab-item
+id: "string" # ID des Tabs
+
+# Parameter tabContent(title, id) # Inhalt des jeweiligen Tabs
+title: "string" # Titel des jeweiligen Tab (wird versteckt dargestellt)
+id: "string" # id für die Section (default: slug des Titels, optional)
+class: "string" # add class to tab-content
+
+# Anwendung
+## Die Javascript-Datei "tabs.js" muss eingebunden sein.
+
+{% from "components/tabs/tabs.njk" import tabs, tabContent with context %}
+
+{% call tabs(items, id, class)%}
+  {% call tabContent(title, class) %}
+    Inhalt frei wählbar
+  {% endcall%}
+{% endcall %}
+--- #}
+
+{% macro tabs(items, id, class) %}
+  <div class="wm-tabs wm-tabs--inverse js-wm-tabs">
+    <ul class="wm-tabs__list js-wm-tabs-list wm-h-list-reset {{class}}">
+      {% for tab in items %}
+        <li class="wm-tabs__item js-wm-tabs-item {{tab.class}}">
+          <a class="wm-tabs__tab {% if tab.active %} wm-tabs__tab--active{% endif %} js-wm-tabs-tab" href="#{{ tab.title | strToSlug }}_{{id}}"  id="tab_{{ tab.title | strToSlug }}_{{id}}">
+            {{ tab.title }}
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+
+    {{ caller() }}
+  </div>
+{% endmacro %}
+
+{% macro tabContent(title, id, class) %}
+  <div class="wm-tabs__panel js-wm-tabs-panel {{class}}" id="{{ id or title | strToSlug }}">
+    {% if title %}
+      <h3 class="wm-tabs__panel-heading js-wm-tabs-panel-heading">{{ title }}</h3>
+    {% endif %}
+    {{ caller() }}
+  </div>
+{% endmacro %}

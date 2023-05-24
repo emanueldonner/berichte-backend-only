@@ -1,0 +1,33 @@
+{# ---
+# Parameter feed()
+class: "string" # Klassenname für den feed-Wrapper
+
+# Parameter feedItem(settings)
+settings: "object"
+  block_link: "boolean" # feedItem wird zu Block-Link (gesamte Fläche verlinkt) und mit Icon chevron-right dargestellt (default: false)
+  attributes: "object" # HTML-Attribute (z. B.: class,...), frei wählbar
+
+# Anwendung
+{% call feed() -%}
+  {% call feedItem(settings) %}
+    Frei wählbarer Inhalt
+  {%- endcall %}
+{%- endcall %}
+--- #}
+{% macro feed(class) %}
+  <ul class="wm-feed {{ class }}">
+    {{ caller() }}
+  </ul>
+{% endmacro %}
+
+{% macro feedItem(settings) %}
+  {% import "components/image/image.njk" as img_macro %}
+
+  <li
+    class="wm-feed__item{% if settings.block_link %} js-wm-block-link {% endif %} {{ settings.attributes.class }}"
+    {% for attribute in settings.attributes %}{{ attribute.name}}="{{ attribute.value}}" {% endfor %}
+    {% if settings.block_link %} data-block-link-ready="wm-feed__item--block" {% endif %}
+  >
+    {{ caller() }}
+  </li>
+{% endmacro %}

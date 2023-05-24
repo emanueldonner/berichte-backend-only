@@ -1,0 +1,132 @@
+{# ---
+# Parameter stage(heading, attributes, modifiers, img, video_settings, link, color)
+heading: "string" # Frei wählbar
+heading_level: "string" # HTML-Element für die Überschrift, kann auch div sein (default: h1)
+attributes: "object" # HTML-Attribute (z. B.: class,...), frei wählbar
+modifiers: "array" # zulässige Werte: desktop-only, home, media, color, right
+img: "object/array" # siehe /pattern-library/patterns/bilder
+video_settings: "object" # siehe /pattern-library/patterns/video-player/
+link: "object" #
+  url: "string" # Pfad des Links
+  text: "string" # Text frei wählbar
+prefix: "string" # Text, der vor den Titel ausgegeben wird (optional)
+no_modal: "Boolean" # Jedes Bild wird automatisch in einer Lightbox dargestellt. „true“, um das zu verhindern.
+
+# Anwendung
+{% from "components/stage/stage.njk" import stage with context %}
+
+{% call stage(heading = "Überschrift") %}
+ Inhalt frei wählbar
+{% endcall %}
+--- #}
+
+{% from "components/image/image.njk" import imageWrapper with context %}
+{% from "components/icon/icon.njk" import icon with context %}
+{% from "components/hervorgehobener-link/hervorgehobener-link.njk" import emLink with context %}
+{% from "components/media/video.njk" import video with context %}
+{% from "components/modal/modal.njk" import modal with context %}
+
+{% macro stage(heading, heading_level = 'h1', heading_class = 'wm-stage__heading', attributes, modifiers, img, video_settings, link, color, prefix, no_modal) %}
+{% set media = img or video_settings %}
+
+<div
+  class="wm-stage {% if no_modal %}js-wm-block-link{% endif %} {{ attributes.class }} {% if color %} wm-stage--{{color}}{% endif %} {% if media %} wm-stage--media{% endif %} {% if video_settings %} js-wm-stage-video{% endif %}{% for modifier in modifiers %} wm-stage--{{ modifier }}{% endfor %}"
+  {% for attribute, value in attributes %}
+    {% if attribute !== 'class'%}
+      {{ attribute }}{% if value %}="{{ value }}"{% endif %}
+    {% endif %}
+  {% endfor %}>
+
+  {% if img %}
+    <div class="wm-stage__media {% for modifier in modifiers %} wm-stage__media--{{ modifier }}{% endfor %}">
+      {% if img | isArray %}
+        {% set group = 5 | randomHash %}
+        {% for i in img %}
+          {% call stage_img(i.image, loop.index0, group, no_modal) %}{% endcall %}
+        {% endfor %}
+      {% else %}
+        {% call stage_img(img = img, no_modal = no_modal) %}{% endcall %}
+      {% endif %}
+    </div>
+  {% endif %}
+
+  {% if video_settings %}
+    <div class="wm-stage__media {% for modifier in modifiers %} wm-stage__media--{{ modifier }}{% endfor %}">
+      {{ video(video_settings) }}
+    </div>
+
+    <div class="wm-stage__controls">
+      <button class="wm-stage__button js-wm-stage-pause wm-btn--round" aria-pressed="false" data-play="Video abspielen" data-pause="Video pausieren">
+        <span class="wm-h-vh js-wm-stage-pause-text">Play</span>
+
+        <span>
+          {{ icon({"id": "pause", "class": "wm-icon__pause", "width": "38"}) }}
+          {{ icon({"id": "play", "class": "wm-icon__play", "width": "38"}) }}
+        </span>
+      </button>
+    </div>
+  {% endif %}
+
+  <div
+    class="wm-stage__content
+    {% if media %}wm-stage__content--media{% endif %}
+    {% for modifier in modifiers %} wm-stage__content--{{ modifier }}{% endfor %}">
+
+    <div
+      class="wm-stage__text
+      {% if media %}wm-stage__text--media{% endif %}
+      {% for modifier in modifiers %} wm-stage__text--{{ modifier }}{% endfor %}">
+
+      {{ prefix | safe }}
+
+      <{{ heading_level }} class="{{ heading_class }}">
+        {{ heading | safe }}
+      </{{ heading_level }}>
+
+      {{ caller() }}
+
+      {% if link %}
+        {% call emLink(url = link.url) %}
+          {{ link.text }}
+        {% endcall %}
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endmacro %}
+
+{% macro stage_img(img, index, group, no_modal) %}
+  {% set link_path = img.src %}
+
+  {% if img.sources %}
+    {% set link_path = img.sources[img.sources | length - 1].url | url %}
+
+    {% if img.sources[img.sources | length - 1].url_retina %}
+      {% set link_path = img.sources[img.sources | length - 1].url_retina | url %}
+    {% endif %}
+  {% endif %}
+
+  {% set modal_settings = { link: link_path } %}
+
+  {% if group %}
+      {% set modal_settings = { link: link_path, group: group } %}
+  {% endif %}
+
+  {% if no_modal %}
+    {% call stage_picture(img) %}{% endcall %}
+  {% else %}
+    {% call modal(modal_settings) %}
+      {% call stage_picture(img) %}{% endcall %}
+    {% endcall %}
+  {% endif %}
+{% endmacro %}
+
+{% macro stage_picture(img) %}
+  <picture>
+    {% for source in img.sources | reverse %}
+      <source {% if img.not_lazy %}srcset{% else %}data-srcset{% endif %}="{{ source.url | url }}{% if source.url_retina %} 1x, {{ source.url_retina| url  }} 2x{% endif %}" media="(min-width: {{ source.size }}px)">
+    {% endfor %}
+
+    {{ imageWrapper(img) }}
+  </picture>
+{% endmacro %}

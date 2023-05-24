@@ -1,0 +1,29 @@
+{# ---
+# Parameter
+color: "string" # Erlaubte Werte: 'nebelgrau', 'abendstimmung', 'morgenrot', 'flieder', 'goldgelb', 'frischgruen', 'wasserblau'
+vpos: "string" # vertikale Position. Erlaubte Werte: top, bottom (default: bottom)
+hpos: "string" # horizontale Position. Erlaubte Werte: left, right (default: right)
+
+# Anwendung
+## Die Javascript-Datei "announcement.js" muss eingebunden sein
+
+{% from "components/announcement/announcement.njk" import announcement with context %}
+
+{% call announcement('wasserblau') %}
+  Text der Ankündigung
+{% endcall %}
+--- #}
+
+{% macro announcement(color, vpos, hpos) %}
+<div class="wm-announce js-wm-announce wm-announce--hidden wm-announce--locked wm-announce--{{ color }} wm-announce--{{ vpos }} wm-announce--{{ hpos }}">
+  <div class="wm-announce__inner">
+    <div class="wm-announce__bg">
+      <div class="wm-announce__content">
+        <div class="wm-announce__text">
+          {{ caller() }}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endmacro %}

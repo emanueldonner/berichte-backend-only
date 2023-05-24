@@ -1,0 +1,15 @@
+{% macro figure(settings) %}
+  <figure class="wm-figure {% if settings.center %}wm-u-tac wm-u-mlrauto{% endif %} {% if settings.inline %}wm-figure--inline{% endif %} {{ settings.attributes.class }} {% if settings.hidden %}wm-u-dn--jsm{% endif %}"
+  {% if not settings.noMaxWidth %}data-wm-figure{% endif %}
+  {% for attribute, value in settings.attributes %}
+    {% if attribute !== 'class'%}
+      {{ attribute }}{% if value %}="{{ value }}"{% endif %}
+    {% endif %}
+  {% endfor -%}>
+    {{ caller() }}
+
+    {% if settings.description %}
+      <figcaption {% if settings.description_class %}class="{{ settings.description_class }}"{% endif %}>{{ settings.description | safe }}</figcaption>
+    {% endif %}
+  </figure>
+{% endmacro %}

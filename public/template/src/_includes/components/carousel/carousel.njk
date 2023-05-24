@@ -1,0 +1,62 @@
+{# ---
+# Parameter carousel(heading, linktext, linkurl, tabletOnly, description, size)
+  heading: "string" # (optional) Karussell Section bekommt eine Überschrift
+  linktext: "string" # (optional) Weiterführender Link unterhalb des Karussells
+  linkurl: "string" # (optional) URL auf die Link weiterleitet
+  tabletOnly: "boolean" # (optional) (default: false) zulässige Werte: true -> Karussell wird erst ab >768px dargestellt
+  description: "string" # (optional) Absatz unterhalb der Überschrift
+  size: "string" # (optional) zulässige Werte: small, large
+
+# Anwendung
+## Die Javascript-Datei "carousel.js" muss eingebunden sein
+## Die CSS-Datei "tiny-slider.css" muss eingebunden sein
+
+{% from "components/carousel/carousel.njk" import carousel with context %}
+{% from "components/card/card.njk" import card with context %}
+
+{% call carousel(heading = "Überschrift") %}
+  <li>
+    {% call card() %}
+      # Parameter und Anwendung "Cards" siehe /pattern-library/patterns/cards/
+    {% endcall %}
+  </li>
+{% endcall %}
+--- #}
+
+{% from "components/hervorgehobener-link/hervorgehobener-link.njk" import emLink with context %}
+
+{% macro carousel(heading, linktext, linkurl, tabletOnly, description, size, section = 'carousel') %}
+  <section class="wm-section wm-section--{{ section }}">
+    <div class="wm-section__content wm-section__content--{{ section }} {% if tabletOnly %} wm-section__content--tablet-only {% endif %}">
+
+      {% if heading %}
+        <h2 {% if description %} style="margin-bottom: 0;" {% endif %}>
+          {{ heading }}
+        </h2>
+      {% endif %}
+
+      {% if description %}
+        <p>
+          {{ description }}
+        </p>
+      {% endif %}
+
+      <ul class="wm-carousel js-wm-carousel"
+        {% if tabletOnly %} data-tablet-only="true" {% endif %}
+        {% if size %} data-size="{{ size }}" {% endif %} >
+          {{ caller() }}
+      </ul>
+
+      {% if linktext %}
+        <p class="wm-u-tar">
+
+          {% call emLink(url = linkurl) %}
+            {{ linktext }}
+          {% endcall %}
+
+        </p>
+      {% endif %}
+
+    </div>
+  </section>
+{% endmacro %}

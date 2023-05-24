@@ -1,0 +1,11 @@
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+{%- set page_title = title + " - " + project.title  -%}
+
+{%- if page.url === '/' -%}
+  {%- set page_title = project.title  -%}
+{%- endif -%}
+
+<title>{{ page_title }}</title>

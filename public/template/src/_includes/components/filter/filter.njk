@@ -1,0 +1,94 @@
+{# ---
+# Parameter
+settings: "object"
+  label: "string" # Text für <label>, frei wählbar
+  noResult: "string"#  Fehler, die gezeigt wird, wenn es keine Ergebnisse gab
+  options: "array" # Optionen im <select>
+    - name: "string" # Name der Option
+      value: "string" # ID der jeweiligen Option -> muss mit selektierbaren Elementen abgestimmt sein
+
+# Anwendung
+{% from "components/filter/filter.njk" import filter with context %}
+## Die Javascript-Datei "filter.js" muss eingebunden sein
+
+{% call filter(settings) %}
+  # Inhalt beispielsweise eine Liste, die filterbar sein soll
+  # Filterbare Elemente müssen ein data-filter Attribut mit dem value der jeweiligen Option haben
+{% endcall %}
+--- #}
+
+{% macro filter(settings) %}
+  <div class="wm-filter js-wm-filter" x-data="{{ settings.id }}">
+    <div class="wm-h-vh" role="alert" aria-atomic="true" x-text="message"></div>
+
+    <form class="wm-form wm-filter__form">
+      {% for select in settings.selects %}
+        <div>
+          <label for="{{ select.id }}_select">
+            {{ select.label }}
+          </label>
+          <select id="{{ select.id }}_select" autocomplete="off" x-model="filters.{{ select.id }}">
+            {% for option in select.options -%}
+              <option value="{{ option.value }}">{{ option.name }}</option>
+            {% endfor -%}
+          </select>
+        </div>
+      {% endfor %}
+    </form>
+
+    <p class="js-wm-filter-no-result wm-u-dn">{{ settings.noResult or 'Keine Ergebnisse.' }}</p>
+
+    {{ caller() }}
+    <script>
+      document.addEventListener('alpine:init', () => {
+        for(const ignore of document.querySelectorAll("[x-ignore]")) {
+          ignore.remove();
+        }
+
+        Alpine.data('{{ settings.id }}', function() {
+          return {
+            filters: {
+              {%- for select in settings.selects -%}
+                {{ select.id }}: this.$persist('')
+                {%- if not loop.last -%},{%- endif -%}
+              {%- endfor -%}
+            },
+            init: false,
+            data: [
+              {%- for item in settings.filter_list -%}
+                {
+                  {%- for key, value in item -%}
+                  '{{ key }}': '{{ value | safe }}'
+                  {%- if not loop.last -%}
+                  ,
+                  {%- endif -%}
+                  {%- endfor -%}
+                }
+                {%- if not loop.last -%}
+                ,
+                {%- endif -%}
+              {%- endfor -%}
+            ],
+            get message() {
+              return `Zeige ${this.filteredData.length} von ${this.data.length} Elementen`
+            },
+            get filteredData() {
+              return this.data.filter((item) => {
+                for (var key in this.filters) {
+                  if (this.filters[key] === '') {
+                    continue
+                  }
+
+                  if (this.filters[key] !== item[key]) {
+                    return false
+                  }
+                }
+                return true
+              });
+            }
+          }
+        })
+      })
+    </script>
+  </div>
+{% endmacro %}

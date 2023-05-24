@@ -1,0 +1,71 @@
+{# ---
+# Parameter chatbot(settings)
+settings: "object"
+  src: "string" # default: https://stp.wien.gv.at/wienbotwidget/static/widget/wienbot/widget.js
+  initialMessage: "string" # optionale erste Frage an den Bot
+  addMessage: "Boolean" # zeigt die Frage beim öffnen des Bots
+  infoText: "string" # optionales zusätzliches Data-Attribut
+  context: "string" # optionales zusätzliches Data-Attribut
+
+# Anwendung
+{% from "components/chatbot/chatbot.njk" import chatbot with context %}
+
+{{chatbot(settings)}}
+
+# Parameter chatbotMessage(buttonText = 'Frage den WienBot', type, msg, resetMsg = false, slug, label)
+  buttonText: "string" # Kann Text des Buttons definieren (default: Frage den WienBot)
+  type: "string" # text (in Verbindung mit msg), quicklink (in Verbindung mit "slug" und "label")
+  msg: "string" # die Frage, die ich an den WienBot übergebe
+  resetMsg: "boolean" # "true" löscht alle Antworten des WienBots und beginnt von vorne. "false" hängt die Antworten des WienBots an
+  slug: "string" # in Verbindung mit type "quicklink"
+  label: "string" # in Verbindung mit type "quicklink"
+
+# Anwendung
+{% from "components/chatbot/chatbot.njk" import chatbotMessage with context %}
+
+# chatbotMessage mit Text:
+{{ chatbotMessage(buttonText = 'Brauche ich heute einen Regenschirm?', type = 'text', msg = 'Brauche ich heute einen Regenschirm?', resetMsg = true)}}
+
+# chatbotMessage mit Quicklink:
+{{ chatbotMessage(type = 'quicklink', slug = 'informationen-alpha', label = 'Zeige Informationen zu Produkt Alpha', resetMsg = true )}}
+--- #}
+{% from "components/button/button.njk" import button with context %}
+
+{% macro chatbot(settings) %}
+  {% set src = 'https://stp.wien.gv.at/wienbotwidget/static/widget/wienbot/widget.js' %}
+
+  {% if settings.src %}
+    {% set src = settings.src %}
+  {% endif%}
+
+  <script
+    async
+    id="ut-widget"
+    src="{{src}}"
+    data-initial-message='{"type": "text", "data": {"text": "{{settings.initialMessage or "Custom Start"}}"}, "addMessage": {{settings.addMessage or false}}}'
+    {% if settings.infoText %}
+    data-info-text="{{settings.infoText}}"
+    {% endif %}
+    {% if settings.context %}
+    data-context="{{settings.context}}"
+    {% endif%}
+  >
+  </script>
+{% endmacro %}
+
+{% macro chatbotMessage(buttonText = 'Frage den WienBot', type, msg, resetMsg = false, slug, label)%}
+  {% if type == 'text' %}
+    <button href="#" class="wm-btn--block-xsm wm-btn--chatbot" onclick="ut_api.sendMessage({message: {type: 'text', data: {text: '{{msg}}' }}, resetMessages: {{resetMsg}} });return false;">
+  {% elif type == 'quicklink' %}
+    <button href="#" class="wm-btn--block-xsm wm-btn--chatbot" onclick="ut_api.sendMessage({
+      message: {type: 'quicklink', data: {intent: {slug: '{{slug}}'}, label: '{{label}}'}}, resetMessages: {{resetMsg}}
+    });return false;">
+  {% endif%}
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" class="wm-icon wm-btn__icon" width="26" height="26" aria-hidden="true" focusable="false">
+        <path stroke="currentColor" style="fill:none;stroke-width:50;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10" d="M198.44 834.86c244.27-81.18 487.34-161.96 730.62-242.81 6.09 124.07-71.97 303.78-257.16 376.63-181.29 71.31-376.04 1.06-473.46-133.82zM649.14 199.59c-4.25-1.6-10.14-3.56-16.51-5.53l9.66-47c28.03-6.74 48.4-32.36 47.63-62.5-.89-34.91-28.52-61.31-63.37-60.55-34.59.76-61.88 28.58-61.68 62.87.11 19.9 10.62 38.1 26.17 49.54l-9.26 45.04c-139.74-25.34-256.06 19.87-350.5 119.27l-37.22-33.06c2.05-6.45 3.12-13.26 2.88-20.25-1.17-34.17-29.95-60.95-64.47-60.02-34.76.94-61.42 28.9-60.6 63.54.81 34.25 29.24 61.86 63.33 61.5 8.53-.09 16.74-2.07 24.23-5.52l37.88 33.65c-99.39 131.98-94.89 290.53-60.88 375.4 257.56-85.59 515.16-171.19 773.94-257.19C862.9 329.9 775.54 244.69 649.14 199.59zM419.65 436.83c1.18 34.25-27.71 64.66-61.74 65.02-34.09.36-62.52-27.25-63.33-61.5-.82-34.64 25.85-62.6 60.61-63.54 34.51-.93 63.29 25.86 64.46 60.02zm208.25-69.48c.88 34.51-25.95 63.09-60.25 64.21-34.19 1.11-64.62-27.93-64.81-61.88-.19-34.29 27.1-62.11 61.68-62.87 34.85-.77 62.49 25.64 63.38 60.54z"/>
+      </svg>
+      <span>
+        {{buttonText}}
+      </span>
+    </button>
+{% endmacro %}

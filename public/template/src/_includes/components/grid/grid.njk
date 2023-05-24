@@ -1,0 +1,17 @@
+{# ---
+# Parameter grid(richText)
+size: "string" #  (default: ''). small oder large (optional)
+
+# Anwendung grid()
+{% from "components/grid/grid.njk" import grid with context %}
+
+{% call grid('large') %}
+  Inhalt frei wählbar
+{% endcall %}
+--- #}
+
+{% macro grid(size) %}
+  <div class="wm-grid{% if size %} wm-grid--{{ size}}{% endif %}">
+    {{ caller() }}
+  </div>
+{% endmacro %}

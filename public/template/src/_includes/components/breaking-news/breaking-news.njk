@@ -1,0 +1,33 @@
+{# ---
+# Parameter
+heading: "string" # frei wählbar (optional)
+
+# Anwendung
+## Die Javascript-Datei "breaking-news.js" muss eingebunden sein
+
+{% from "components/breaking-news/breaking-news.njk" import breakingNews with context %}
+
+{% call breakingNews("Überschrift") %}
+  Text frei wählbar
+{% endcall %}
+--- #}
+
+{% from "components/icon/icon.njk" import icon with context %}
+
+{% macro breakingNews(heading) %}
+<div class="wm-breaking-news-wrapper js-wm-breaking-news-wrapper" role="region" aria-label="Eilmeldungen">
+  <div class="wm-breaking-news js-wm-breaking-news">
+    <div class="wm-section__content">
+      <div class="wm-breaking-news__inner js-wm-breaking-news-inner">
+        <button class="wm-breaking-news__button wm-btn--clean js-wm-breaking-news-close" hidden>
+          <span class="wm-h-vh">Eilmeldung schließen</span>
+
+          {{ icon({"id":"close"}) }}
+        </button>
+        {% if heading %} <h2 class="wm-breaking-news__heading">{{ heading | safe }}</h2> {% endif %}
+        {{ caller() }}
+      </div>
+    </div>
+  </div>
+</div>
+{% endmacro %}

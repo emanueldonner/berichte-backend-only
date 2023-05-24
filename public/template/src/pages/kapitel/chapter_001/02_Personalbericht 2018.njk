@@ -1,0 +1,16 @@
+---
+title: Personalbericht 2018
+permalink: /{{ page | parentSlug }}/{{ title | strToSlug }}/index.html
+hide_nav: true
+image1:
+  src: /images/image7.png
+  link: /images/image7.png
+  alt: ""
+  attributes:
+    width: 2113
+    height: 1058
+---
+{% from "components/image/image.njk" import image with context %}
+<p>Der erste Bericht, der mittels des neuen Frameworks umgesetzt wurde, war der Personalbericht 2018, der 2019 erschienen ist. Aktuell ist der Personalbericht 2019 unter folgendem Link online verfügbar: <a href="https://www.wien.gv.at/spezial/personalbericht2019/index.html">https://www.wien.gv.at/spezial/personalbericht2019/index.html</a></p>
+{{ image(image1) }}
+

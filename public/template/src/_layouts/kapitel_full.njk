@@ -1,0 +1,9 @@
+---
+layout: kapitel_base.njk
+---
+
+{% from "components/section/section.njk" import section with context %}
+
+{% call section() %}
+  {{ content | safe }}
+{% endcall %}

@@ -1,0 +1,21 @@
+{% from "components/icon/icon.njk" import icon with context %}
+
+{% macro combobox(arr) %}
+  <div class="wm-combo-box js-wm-combo-box">
+  <label for="keyword">
+    Schlüsselwort
+  </label>
+  <div class="wm-combo-box__input">
+    <input id="keyword" class="js-pl-icon-filter-keywords" type="text" role="combobox" aria-autocomplete="both" autocomplete="off" aria-expanded="false" aria-controls="lb-icons" aria-haspopup="true" aria-activedescendant="">
+    <button class="wm-combo-box__btn wm-btn--clean" type="button" id="cb1-button" aria-label="Open" tabindex="-1">
+      {{ icon({"id":"chevron-down", "width":"25"}) }}
+    </button>
+  </div>
+
+  <ul class="wm-combo-box__list wm-site-search__results" id="lb-icons" role="listbox" aria-label="Icons" tabindex="-1" hidden>
+    {% for icon in icon_data[arr] %}
+      <li data-combo-box-option="{{ icon.category | slug }}" id="{{ icon.id }}" role="option" class="wm-search-results__link">{{ icon.keywords }}</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endmacro %}

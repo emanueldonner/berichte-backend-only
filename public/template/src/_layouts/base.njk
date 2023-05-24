@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="{{ project.lang }}" class="wm-no-js {% if project.nav.main %}wien{% else%}wm-has-ms-nav{% endif %} {{ html_class }}">
+<head>
+  {% include "includes/headmetafirst.njk" %}
+  {% include "includes/headjs.njk" %}
+  {% include "includes/headcss.njk" %}
+  {% include "includes/headmeta.njk" %}
+</head>
+<body id="top" class="js-wm-site {{ body_class }}" {% if nav_nojs %}data-nav-open="true" data-nav-unlock="true" data-nav-active{% endif %}>
+  <div class="wm-site-wrapper js-wm-site-wrapper">
+    {%- from "components/site/header/site-header.njk" import siteheader, siteheader_title, siteheader_logo with context -%}
+
+    {#
+      Bisserl potschat, aber da werden die Actions aus dem project.js
+      mit dem Suche-Include, das immer drinnen sein soll, gemerged.
+    #}
+    {% set nav = project.navbar %}
+    {% set actions = ['partials/search.njk'] %}
+    {% set actions_tmp = [] %}
+
+    {% for action in nav.actions %}
+       {% set actions = (actions.push(action), actions) %}
+       {% set actions_tmp = (actions_tmp.push(action), actions_tmp) %}
+    {% endfor %}
+
+    {% set nav = nav|setAttribute('actions', actions) %}
+
+    {% call siteheader(nav) -%}
+      {{ siteheader_title(title = project.title, link = '/' | url ) }}
+      {{ siteheader_logo(link='/') }}
+    {%- endcall %}
+
+    {# Die Actions werden wieder resettet, weil es sonst zu Rekursion kommt #}
+    {% set nav = nav|setAttribute('actions', actions_tmp) %}
+
+    <main class="wm-site-content {{ main_class }}" data-wm-site-content>
+      <div id="content" tabindex="-1">
+        {{ content | safe }}
+      </div>
+    </main>
+
+    {% if project.build_env === 'MAG' %}
+      <!--#include virtual="/layout-a/melange/includes/footer.inc"-->
+    {% else %}
+      {% include "partials/footer.njk" %}
+    {% endif %}
+  </div>
+
+  {% include "includes/foot.njk" %}
+</body>
+</html>

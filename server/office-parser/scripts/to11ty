@@ -1,0 +1,23 @@
+#!/bin/bash
+
+
+source_dir=$1
+destination_dir=$2
+
+
+[ -e $source_dir/src/_data/chapters.json ] || exit 1
+[ -e $destination_dir/_11ty ] || exit 2
+[ -e $destination_dir/.eleventy.js ] || exit 3
+
+
+
+rm -rf $destination_dir/src/pages/kapitel/chapter_[0-9][0-9]
+rm -rf $destination_dir/src/images/*
+
+cp -r $source_dir/src/pages/kapitel/* $destination_dir/src/pages/kapitel/
+cp -r $source_dir/src/images/* $destination_dir/src/images/
+cp -- $source_dir/src/_data/chapters.json $destination_dir/src/_data/chapters.json
+
+
+
+echo $destination_dir/src/pages/index.njk muss vielleicht angepasst werden ...

@@ -1,0 +1,46 @@
+{# ---
+# Parameter pagination(items, id, attributes)
+items: "Array" # Liste mit Paginierungs-Elementen
+  - text: "string" # Nummerierung der Paginierungs-Elemente
+    url: "string" # Pfad zur Seite
+    icon: "string" # (optional) Statt Zahl, Icon anzeigen
+id: "string" # ID der Paginierung, kann übergeben werden, um bei mehreren Paginierungen auf einer Seite Validierungsfehler zu vermeiden (default: 'nav_paginierung')
+attributes: "object" # HTML-Attribute (z. B.: class,...), frei wählbar
+
+# Anwendung
+{% from "components/pagination/pagination.njk" import pagination with context %}
+
+{{ pagination(items) }}
+--- #}
+
+{% from "components/icon/icon.njk" import icon with context %}
+
+{% macro pagination(items, id, attributes) %}
+  <nav class="wm-pagination {{ class }}" aria-labelledby="{{ id | default('nav_paginierung')}}"
+      {%- for attribute, value in attributes -%}
+        {% if attribute !== 'class' %} {{ attribute }}{% if value %}="{{ value }}"{% endif %}{%- endif -%}
+      {%- endfor -%}>
+    <span hidden id="{{ id | default('nav_paginierung')}}">Seiten blättern</span>
+
+    <ol class="wm-pagination__items">
+      {% for item in items %}
+        {{paginationItem(text= 'Seite', item = item, hash = id)}}
+      {% endfor %}
+    </ol>
+  </nav>
+{% endmacro %}
+
+{% macro paginationItem(text, item, hash) %}
+  <li class="wm-pagination__item">
+    <a href="{{item.url}}" class="wm-pagination__link"
+        {% if item.active %} aria-current="page" {% endif %}
+        >
+      <span class="wm-h-vh">{{text}}</span>
+      {% if item.icon %}
+        {{ icon({"id": item.icon, title: item.text, hash: hash}) }}
+      {% else %}
+        {{item.text }}
+      {% endif %}
+    </a>
+  </li>
+{% endmacro %}

@@ -1,0 +1,14 @@
+[
+    {
+        "title": "Das Berichte-Framework",
+        "folder": "chapter_000",
+        "bg": "morgenrot",
+        "color": "fastschwarz"
+    },
+    {
+        "title": "Beispiele",
+        "folder": "chapter_001",
+        "bg": "goldgelb",
+        "color": "fastschwarz"
+    }
+]

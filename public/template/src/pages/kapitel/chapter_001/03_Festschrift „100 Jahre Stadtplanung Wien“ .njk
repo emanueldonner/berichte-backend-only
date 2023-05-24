@@ -1,0 +1,22 @@
+---
+title: "Festschrift „100 Jahre Stadtplanung Wien“ "
+permalink: /{{ page | parentSlug }}/{{ title | strToSlug }}/index.html
+hide_nav: true
+image1:
+  src: /images/image8.jpeg
+  link: /images/image8.jpeg
+  alt: |-
+    Ein Bild, das Text enthält.
+
+    Automatisch generierte Beschreibung
+  attributes:
+    width: 1280
+    height: 960
+---
+{% from "components/image/image.njk" import image with context %}
+<p>Der zweite Anwendungsfall war die Publikation „100 Jahre Stadtplanung“, ein sehr aufwändig gemachtes Buch mit eigens angefertigten Porträts der Autor*innen usw., das Anfang 2020 präsentiert wurde.</p>
+{{ image(image1) }}
+<figcaption>Festschrift 100 Jahre Stadtentwicklung - Printpublikation</figcaption>
+<p>Die Webversion wurde ausgehend von der Printversion für das Online-Lektüre optimiert:</p>
+<p>Link: <a href="https://www.wien.gv.at/spezial/festschrift-stadtentwicklung/">https://www.wien.gv.at/spezial/festschrift-stadtentwicklung/</a></p>
+

@@ -1,0 +1,35 @@
+{# ---
+# Parameter
+url: "string" # URL oder Anker
+block: "Boolean" # (default: false) nimmt volle Breite ein
+attributes: "object" # HTML-Attribute (z. B.: class, etc.), frei wählbar
+flip: "Boolean" # (default: false) Icon links und nicht rechts vom Text anzeigen
+
+# Anwendung
+{% from "components/hervorgehobener-link/hervorgehobener-link.njk" import emLink with context %}
+
+{% call emLink(url='/seite.html') %}
+  Text frei wählbar
+{% endcall %}
+--- #}
+
+{% from "components/icon/icon.njk" import icon with context %}
+
+{% macro emLink(url = '#', block=false, attributes, flip=false) %}
+  {% set href = url | url %}
+  {% if 'http' in url + "" %}
+    {% set href = url %}
+  {% endif %}
+  <a
+  href="{{ href }}"
+  class="wm-em-link{% if block %} wm-em-link--block{% endif %} {% if flip %}wm-em-link--flip{% endif %} {{ attributes.class }}"
+    {% for attribute, value in attributes %}
+      {% if attribute != 'class'%}
+        {{ attribute }}{% if value %}="{{ value }}"{% endif %}
+      {% endif %}
+    {% endfor %}
+    data-wm-em-link
+  >
+    <span class="wm-em-link__content">{{ caller() }}</span>
+  </a>
+{% endmacro %}

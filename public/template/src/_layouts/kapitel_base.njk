@@ -1,0 +1,72 @@
+---
+layout: base.njk
+mainstage:
+    modifiers:
+        -  color
+---
+{% from "components/section/section.njk" import section with context %}
+{% from "components/stage/stage.njk" import stage with context %}
+{% from "components/hervorgehobener-link/hervorgehobener-link.njk" import emLink with context %}
+
+{% set parent_chapter = chapters[chapter] %}
+
+{% set chapter_title = title %}
+{% set chapter_index = chapter + 1 %}
+
+{% if project.skipFirstChapter %}
+    {% set chapter_index = chapter %}
+{% endif %}
+
+{% if subchapter > 0 %}
+    {% set chapter_title = chapter_index + "." + subchapter + " " + title %}
+{% endif %}
+
+{% set parent_chapter_title = chapter_index + '. ' + parent_chapter.title %}
+
+{% if project.skipFirstChapter and chapter == 0 %}
+    {% set chapter_title = title  %}
+    {% set parent_chapter_title = parent_chapter.title %}
+{% endif %}
+
+{% set chapterStyle = chapters_styles[chapter] %}
+{% set image_path = parent_chapter.image or chapterStyle.image %}
+{% set image_alt = chapter.image_alt or chapterStyle.image_alt %}
+{% set image_title = chapter.image_title or chapterStyle.image_title %}
+{% set image_color = chapterStyle.bg or parent_chapter.bg or 'nebelgrau-light' %}
+
+{% if image_path %}
+    {% set stage_image = { not_lazy: true, src: image_path, alt: image_alt, attributes: { width: 1200, height: 500, title: image_title } } %}
+{% endif %}
+
+{% set id = '/#' + parent_chapter.title | slug %}
+
+{% call stage(heading = chapter_title, attributes = { "class": "wm-theme-bg--" + image_color }, modifiers = mainstage.modifiers, img = stage_image, prefix= '<em><a href="' + id | url + '" class="wm-link--unstyled">' + parent_chapter_title + '</a></em>' ) %}{% endcall %}
+
+{{ content | safe }}
+
+{% set previousPost = collections.chapters | getPreviousCollectionItem(page) %}
+{% set nextPost = collections.chapters | getNextCollectionItem(page) %}
+
+{% call section('highlight') %}
+    <nav aria-label="Seiten blättern">
+        <ol class="wm-row wm-u-lsn {% if nextPost %}wm-u-jcfe{% endif %}" style="padding: 0">
+            {% if previousPost %}
+                <li>
+                    <span style="padding-left: 28px">Vorheriges Kapitel:</span><br>
+                    {% call emLink(url = previousPost.url, flip = true) %}
+                        {{ previousPost.data.title | chapterPrefix(previousPost.data.chapter, previousPost.data.subchapter) | safe }}
+                    {% endcall %}
+                </li>
+            {% endif %}
+
+            {% if nextPost %}
+                <li class="wm-u-tar">
+                    <span style="padding-right: 28px">Nächstes Kapitel:</span><br>
+                    {% call emLink(url = nextPost.url) %}
+                        {{ nextPost.data.title | chapterPrefix(nextPost.data.chapter, nextPost.data.subchapter) | safe }}
+                    {% endcall %}
+                </li>
+            {% endif %}
+        </ol>
+    </nav>
+{% endcall %}

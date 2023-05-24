@@ -1,0 +1,30 @@
+{%- set site_url = project.url -%}
+{%- set description =  description or project.description %}
+
+{% set preloadWoff = '/assets/' + project.version_folder + '/fonts/WienerMelangeVF.woff2' %}
+<link rel="preload" href="{{ preloadWoff | url }}" as="font" type="font/woff2" crossorigin>
+
+{% if preload %}
+  {% for link in preload %}
+    <link rel="preload" href="{{ link.path }}" as="{{ link.type }}" {% if link.media %}media="{{ link.media }}"{% endif %}>
+  {% endfor %}
+{% endif %}
+
+<meta name="description" content="{{ description }}">
+<meta name="theme-color" content="{{ project.theme_color }}">
+
+<link rel="icon" href="{{ '/favicon.ico' | url }}">
+<link rel="icon" href="{{ '/favicon.svg' | url }}" type="image/svg+xml">
+<link rel="apple-touch-icon" href="{{ '/apple-touch-icon.png' | url }}">
+<link rel="manifest" href="{{ '/wien.webmanifest' | url }}">
+
+<meta property="og:title" content="{{ page_title }}">
+<meta property="og:description" content="{{ description }}">
+<meta property="og:image" content="{{ site_url + '/images/metawien.jpg' | url }}">
+<meta property="og:locale" content="de">
+<meta property="og:type" content="website">
+<meta property="og:url" content="{{ site_url }}{{ page.url | url }}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@StadtWien">
+
+<link rel="canonical" href="{{ site_url }}{{ page.url | url }}">

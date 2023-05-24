@@ -1,0 +1,23 @@
+{# ---
+# Parameter progress(settings)
+settings: "object"
+  items: "array" # Liste mit Schritten
+    - text: "string" # Text frei wählbar
+      current: "Boolean" # Aktiver Schritt
+  currentText: "string" # Kennzeichnungstext für den aktuellen Menüpunkt (Default: „Aktueller Schritt”)
+
+# Anwendung
+{% from "components/progress/progress.njk" import progress with context %}
+
+{{ progress(settings) }}
+--- #}
+
+{% macro progress(settings) %}
+  <ol class="wm-progress">
+    {% for item in settings.items %}
+      <li class="wm-progress__step" {% if item.current %}aria-current="step"{% endif %}>
+        <span class="wm-progress__text">{{ item.text }}</span>
+      </li>
+    {% endfor %}
+  </ol>
+{% endmacro %}

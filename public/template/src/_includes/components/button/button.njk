@@ -1,0 +1,113 @@
+{# ---
+# Parameter
+settings: "object"
+  color: "string" # Erlaubte Werte: frischgruen, success, danger (Default: '')
+  style: "string" # Erlaubte Werte: tag, clean, round (Default: '')
+  text: "string" # Ab wann soll text im Button angezeigt werden, Erlaubte Werte: l
+  size: "string" # block, block-xsm, block-sm, min, large (Default: '')
+  invert: "boolean" # Farben invertieren (Default: false, true (sekundär Button))
+  attributes: "object" # HTML-Attribute (z. B.: width, class,...), frei wählbar
+  url: "string" # Erzeugt automatisch einen Link-Button
+  icon: "object" # Icon, das links (default) neben dem Text dargestellt wird
+    position: "string" # Position des Icons. Erlaubte Werte: start (links) oder end (rechts)
+    id: "string" # ID des Icons (siehe /look-and-feel/icons/?icon_cat=uiedv)
+    width: "int" # Breite (Default: 28)
+    title: "string" # Alternativer Text für das Icon, wenn es keinen Buttontext gibt (Default: '')
+
+# Anwendung
+{% from "components/button/button.njk" import button with context %}
+
+{% call button(settings) %}
+  Button bzw. Link-Text
+{% endcall %}
+--- #}
+
+{% from "components/icon/icon.njk" import icon with context %}
+
+{% macro button(settings) %}
+  {% set class = '' %}
+
+  {% if settings.invert or settings.color %}
+    {% set class = 'wm-btn-' %}
+
+    {% if settings.color %}
+      {% set class = class + '-' + settings.color  %}
+    {% endif %}
+
+    {% if settings.invert %}
+      {% set class = class + '-i'  %}
+    {% endif %}
+  {% endif %}
+
+  {%- if settings.attributes.class %}
+    {% if class %}
+      {% set class = class + ' ' %}
+    {% endif %}
+
+    {% set class = class + settings.attributes.class  %}
+  {%- endif -%}
+
+  {%- if settings.size %}
+    {% if class %}
+      {% set class = class + ' ' %}
+    {% endif %}
+
+    {% set class = class + 'wm-btn--' + settings.size  %}
+  {%- endif -%}
+
+  {%- if settings.style %}
+    {% if class %}
+      {% set class = class + ' ' %}
+    {% endif %}
+
+    {% set class = class + 'wm-btn--' + settings.style  %}
+  {%- endif -%}
+
+  {% set button_content_class = '' %}
+
+  {% if settings.text %}
+    {% set button_content_class = 'wm-btn__text wm-btn__text--' + settings.text %}
+  {% endif %}
+
+  {% if settings.url %}
+    <a href="{{ settings.url|default("#") }}" class="wm-btn {{ class }}"
+      {%- for attribute, value in settings.attributes -%}
+        {% if attribute !== 'class' %} {{ attribute }}{% if value %}="{{ value }}"{% endif %}{%- endif -%}
+      {%- endfor -%}>
+
+      {%- if settings.icon and settings.icon.position != 'end' -%}
+        {{ icon(settings.icon | addProperty( "class", "wm-btn__icon")) }}
+      {%- endif -%}
+
+      {% if caller() | trim | length > 0 %}
+        <span{% if button_content_class %} class="{{ button_content_class }}"{% endif %}>
+          {{- caller() -}}
+        </span>
+      {% endif %}
+
+      {%- if settings.icon and settings.icon.position == 'end' -%}
+        {{ icon(settings.icon | addProperty( "class", "wm-btn__icon")) }}
+      {%- endif -%}
+    </a>
+  {% else %}
+    <button
+      {%- if class %} class="{{ class }}"{%- endif -%}
+      {%- for attribute, value in settings.attributes -%}
+        {% if attribute !== 'class' %} {{ attribute }}{% if value %}="{{ value }}"{% endif %}{%- endif -%}
+      {%- endfor -%}>
+      {%- if settings.icon and settings.icon.position != 'end' -%}
+        {{ icon(settings.icon | addProperty( "class", "wm-btn__icon")) }}
+      {%- endif -%}
+
+      {% if caller() | trim | length > 0 %}
+        <span{% if button_content_class %} class="{{ button_content_class }}"{% endif %}>
+          {{- caller() -}}
+        </span>
+      {% endif %}
+
+      {%- if settings.icon and settings.icon.position == 'end' -%}
+        {{ icon(settings.icon | addProperty( "class", "wm-btn__icon")) }}
+      {%- endif -%}
+    </button>
+  {% endif %}
+{% endmacro %}

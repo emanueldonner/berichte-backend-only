@@ -1,0 +1,49 @@
+{# ---
+# Parameter accordion(open, mobile)
+open: "boolean" # true -> Erstes Element ausgeklappt (default: false)
+mobile: "boolean" # true -> Wird nur auf kleinen Bildschirmen als Akkordeon dargestellt (default: false)
+
+# Parameter accordionItem(text, icon_id)
+text: "string" # Aufklapptext des Akkordeon-Elements
+icon_id: "string" # (default: chevron-down) ID des Icons, das neben dem Aufklapptext angezeigt wird
+
+# Anwendung
+## Die Javascript-Datei "accordion.js" muss eingebunden sein
+
+{% from "components/accordion/accordion.njk" import accordion, accordionItem with context %}
+
+{% call accordion() %}
+  {% call accordionItem(text = 'Titel') %}
+    <p>Text- oder HTML-Inhalt</p>
+  {% endcall %}
+{% endcall %}
+--- #}
+
+{% from "components/icon/icon.njk" import icon with context %}
+
+{% macro accordion(open = false, mobile = false) %}
+  <div class="wm-accordion js-wm-accordion"
+    {% if open %} data-first-open="true" {% endif %}
+    {% if mobile %} data-mobile-only="true" {% endif %}
+  >
+    {{ caller() }}
+  </div>
+{% endmacro %}
+
+{% macro accordionItem(text, icon_id) %}
+  <h3 class="wm-accordion__header js-wm-accordion-header">
+      {{ text }}
+
+      {% if icon_id %}
+        {{ icon({"id": icon_id, "hidden": true, "class": "wm-accordion__icon" }) }}
+      {% else %}
+        {{ icon({"id": 'chevron-down', "hidden": true, "class": "wm-accordion__icon wm-accordion__icon--status" }) }}
+      {% endif %}
+  </h3>
+
+  <div class="wm-accordion__panel js-wm-accordion-panel">
+    <div class="wm-accordion__panel-inner">
+      {{ caller() }}
+    </div>
+  </div>
+{% endmacro %}

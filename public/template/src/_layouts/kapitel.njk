@@ -1,0 +1,22 @@
+---
+layout: kapitel_base.njk
+---
+
+{% from "components/section/section.njk" import section with context %}
+{% from "components/row/row.njk" import row with context %}
+
+{% if not hide_nav %}
+  <div data-wm-inpage-nav="toggle">
+    {% call section() %}
+      {% call row() %}
+        {{ content | safe }}
+      {%- endcall -%}
+    {% endcall %}
+  </div>
+{% else %}
+  {% call section() %}
+    {% call row() %}
+      {{ content | safe }}
+    {%- endcall -%}
+  {% endcall %}
+{% endif %}

@@ -1,0 +1,93 @@
+{# ---
+# Parameter siteheader(nav_settings)
+nav_settings: "object" # Einstellungen für Navigation (siehe Pattern Menü: /pattern-library/patterns/menue/)
+
+# Parameter siteheader_title(title, title_addon, link)
+title: "string" # Titel der Site
+title_addon: "string" # Titelzusatz
+link: "string" # Link des Titels (optional)
+
+# Parameter siteheader_logo(lang, link)
+lang: "string" # Logo in entsprechender Sprache (default: "de")
+link: "string" # URL des verlinkten Logos
+
+# Parameter siteheader_search(label, placeholder, link, inline)
+label: "string" # Label des Suchfeldes(default: 'Suche')
+placeholder: "string" # Platzhaltertext (default: 'Wie können wir helfen?')
+link: "string" # Fallbacklink für no-JS Variante der Suche
+inline: "boolean" # Suchefeld erst bei Klick sichtbar (default: false)
+
+# Anwendung
+{% from "components/site/header/site-header.njk" import siteheader, siteheader_title, siteheader_logo, siteheader_search with context %}
+
+{% call siteheader(nav_settings) -%}
+  {{ siteheader_logo() }}
+  {{ siteheader_search() }}
+{%- endcall %}
+--- #}
+{% from "components/nav/main/nav-main.njk" import nav, nav_wrapper with context %}
+{% from "components/search/search.njk" import search with context %}
+{% from "components/logo/logo.njk" import logo with context %}
+{% from "components/skip-links/skip-links.njk" import skipLinks with context %}
+
+{% macro siteheader(nav_settings) %}
+
+  <header class="wm-site-header js-wm-site-header {% if (nav_settings.nomargin or stagePresent) and stagePresent != false %}wm-site-header--no-margin{% endif %}">
+    {{ skipLinks() }}
+
+    <div class="wm-site-header__inner">
+      {{ caller() }}
+
+      {% if nav_settings and nav_settings.type != 'microsite' %}
+        {{ nav(nav_settings) }}
+      {% endif %}
+    </div>
+
+    {% if nav_settings.type == 'microsite' %}
+      {% call nav_wrapper(nav_settings) -%}
+        {{ nav(nav_settings) }}
+      {%- endcall %}
+    {% endif %}
+  </header>
+{% endmacro %}
+
+{% macro siteheader_title(title, title_addon, link) %}
+  {% set tag = h1 %}
+  {% set class = 'wm-site-header__title' %}
+
+  {% if page.url === '/' %}
+    <h1 class="{{ class }}">
+  {% else %}
+    <div class="{{ class }}">
+  {% endif %}
+
+  {% if link %}
+    <a href="{{ link }}" class="wm-link--unstyled">
+      {{ title }}
+
+      {% if title_addon %}
+        <span class="wm-site-header__title-addon">{{ title_addon }}</span>
+      {% endif %}
+    </a>
+  {% else %}
+    {{ title }}
+  {% endif %}
+
+  {% if page.url === '/' %}
+    </h1>
+  {% else %}
+    </div>
+  {% endif %}
+{% endmacro %}
+
+{% macro siteheader_logo(lang = 'de', link) %}
+  <span class="wm-site-header__logo">
+    {{ logo(link = link, lang = lang) }}
+  </span>
+{% endmacro %}
+
+{% macro siteheader_search(label = 'Suche', placeholder = 'Wie können wir helfen?', link = '#', inline) %}
+  {% call search(label, placeholder, link, inline, search_class='wm-site-header__search js-wm-search-container') %}
+
+  {% endcall %}
+{% endmacro %}

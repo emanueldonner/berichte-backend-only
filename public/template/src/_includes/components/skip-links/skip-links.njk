@@ -1,0 +1,18 @@
+{% macro skipLinks(skiplinks) %}
+
+<div class="wm-skip-links js-wm-skip-links wm-h-vh">
+  <a href="#content" class="wm-btn wm-btn--small js-wm-skip-link">
+    Zum Inhalt springen
+  </a>
+
+  {% for link in skiplinks %}
+    <a href="{{link.url}}" class="wm-btn wm-btn--small js-wm-skip-link">
+      {{ link.text}}
+    </a>
+  {% endfor %}
+
+  <a href="https://www.wien.gv.at/info/barrierefreiheit.html" class="wm-btn wm-btn--small wm-btn--i js-wm-skip-link">
+    Barrierefreiheit auf wien.gv.at
+  </a>
+</div>
+{% endmacro %}

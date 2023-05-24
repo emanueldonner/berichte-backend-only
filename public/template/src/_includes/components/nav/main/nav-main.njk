@@ -1,0 +1,180 @@
+{# ---
+# Parameter nav(settings)
+settings: "object"
+  title: "string" # Titel der Navigation
+  button_label: "string" # Label des Buttons
+  nojslink: "string" # Pfad zur no-JS Variante des Menüs
+  type: "string" # Zulässige Werte: 'microsite' (default: false)
+  color: "string" # 'abendstimmung', 'morgenrot', 'flieder', 'goldgelb', 'nebelgrau', 'frischgruen', 'wasserblau' (default: nebelgrau)
+  desktop: "string" # Auf Desktop als horizontale Navigation darstellen (default: false)
+  burger: "string" # Burger Icon ausgeben (default: false)
+  dense: "boolean" # Wenig Abstand zwischen Menüpunkten ausgeben (default: false)
+  hide_linktext: "string" # Buttontext visuell verstecken
+  lists: "array" # Welche Daten sollen angezeigt werden und woher kommen sie.
+    - "array" # Kann eine collection sein oder ein include
+      - "string" # Name der Collection oder Pfad zum include
+      - "string" # Typ: 'include' oder 'collection'
+      - "string" # (optional) Welche Liste in nav_data.json soll ausgegeben werden
+  actions: "array" # Liste von Pfaden zu includes für die Navigation
+
+# Anwendung
+{% from "components/nav/main/nav-main.njk" import nav, nav_wrapper with context %}
+
+{% call nav_wrapper(c) -%}
+  {{ nav(settings) }}
+{%- endcall %}
+
+--- #}
+{% from "components/icon/icon.njk" import icon with context %}
+
+{% macro nav(settings) %}
+  {% if settings.lists | length > 0 %}
+    <nav class="wm-nav-main {% if settings.dense %} wm-nav-main--d{% endif %}{% if settings.desktop %} wm-nav-main--h{% endif %}" data-wm-nav-main="{% if settings.lazy %}lazy{% else %}true{% endif %}" aria-labelledby="mainnav_title">
+      <span hidden id="mainnav_title">{{ settings.title }}</span>
+
+      <a href="{{ settings.nojslink | url }}" class="wm-nav-main__toggle wm-nav-main-btn" data-wm-nav-main-toggle>
+        <span class="wm-nav-main-btn__text{% if settings.burger %} wm-nav-main-btn__text--burger wm-h-vh{% endif %}{% if settings.hide_linktext %} wm-nav-main-btn__text--hidden{% endif %}">
+          {{ settings.button_label or 'Menü' }}
+        </span>
+
+        {% if settings.burger %}
+          <span>
+            {{ icon({"id": "burger", "class": "wm-nav-main-btn__icon wm-nav-main-btn__icon--open"}) }}
+
+            {{ icon({"id": "close", "class": "wm-nav-main-btn__icon wm-nav-main-btn__icon--close"}) }}
+          </span>
+        {% endif %}
+      </a>
+
+      <div class="wm-nav-main__header" data-wm-nav-main-header>
+        {% if settings.name %}
+          <span class="wm-nav-main__greeting">
+            Hallo, {{ settings.name }}!
+          </span>
+        {% endif %}
+      </div>
+
+      <div class="wm-nav-main__inner" data-wm-nav-main-inner tabindex="-1">
+        <div class="wm-nav-main__content" id="nav_content">
+          <div class="wm-nav-main__lists">
+            {% if not settings.lazy %}
+              {{ nav_lists(settings) }}
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </nav>
+  {% endif %}
+
+  {% if settings.actions %}
+    <div class="wm-nav-main__actions js-wm-nav-main-actions js-wm-search-container">
+      {% for action in settings.actions %}
+        {% include action %}
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endmacro %}
+
+{% macro nav_lists(settings) %}
+  {% for list in settings.lists %}
+    {% if list[1] == 'collection' %}
+      {{ navlist(items = collections[list[0]], type = 'collection')}}
+    {% else %}
+      {% if list[2] %}
+        {% set list_data = list[2]%}
+      {% endif %}
+
+      {% include list[0] %}
+    {% endif %}
+  {% endfor %}
+{% endmacro %}
+
+{% macro navitem(item, children, level) %}
+  {# wm-nav-main__link--active = Aktuelle Seite + alle Elternseiten #}
+  {# data-active = Alle aufgeklappten Elternseiten #}
+  {# aria-current="page" = Aktuelle Seite und nicht die Elternseiten #}
+  <a
+    href="{{ item.url | url }}"
+    class="wm-nav-main__link
+          {% if level > 1 and children | length > 0%}wm-nav-main__sublink{% endif %}
+          {% if children | length > 0 %}js-wm-nav-main-sublink{% endif %}
+          {% if item.url | replace("/", "" ) in page.url | replace("/", "" ) %}wm-nav-main__link--active{% endif %}
+          "
+    {% if item.url | replace("/", "" ) == page.url | replace("/", "" ) %}aria-current="page"{% endif %}
+    {% if item.url | replace("/", "" ) in page.url | replace("/", "" ) %}data-active{% endif %}
+    {% if children | length > 0 %}
+      {% if item.data.type == 'click' or item.data.type == 'click' %}
+        data-click="true"
+      {% endif %}
+    {% endif %}
+    >
+    {% if item.icon %}
+      {{ icon(item.icon | addProperty("class", "wm-nav-main__icon")) }}
+    {% endif %}
+
+    {% if level == 1 %}<span>{% endif %}
+       {{ item.data.nav_title or item.data.title | safe }}
+    {% if level == 1 %}</span>{% endif %}
+
+    {% if children | length > 0 %}
+      {% set icon_class = "wm-nav-main__subnav-icon" %}
+      {% if item.type == 'click' or item.data.type == 'click' %}
+        {% set icon_class = "wm-nav-main__subnav-icon wm-nav-main__subnav-icon--desktop" %}
+      {% endif %}
+
+      {{ icon({"id":"chevron-down", "class": icon_class}) }}
+    {% endif %}
+  </a>
+{% endmacro %}
+
+{% macro navlist(items, level = 1, type='data', nav_open=false, parent_item=false) %}
+  <ol
+    class="wm-nav-main__list wm-nav-main__list--{{ level }} {% if nav_open %}wm-nav-main__list--is-visible{% endif %}"
+    {% if nav_open %}style="height: auto;"{% endif %}
+    >
+    {% if parent_item %}
+      <li>
+        {% set titleString = parent_item.data.title or parent_item.title %}
+        {% set title = '<span class="wm-h-vh">' + titleString + '</span>' + 'Übersicht' %}
+        {% set item =  { "data": { "title": title}, "url": parent_item.url } %}
+        {{ navitem(item) }}
+      </li>
+    {% endif %}
+
+    {% for item in items %}
+      {% if type == 'collection' and item.data.id %}
+        {% set children = collections[item.data.id] %}
+      {% endif %}
+
+      {% if item.children or children %}
+        {% set subitems = item.children or children %}
+      {% endif %}
+
+      {% set nav_state = false %}
+
+      {% if item.url | replace("/", "" ) in page.url | replace("/", "" ) %}
+        {% set nav_state = true %}
+      {% endif %}
+
+      <li>
+        {{ navitem(item, subitems, level = level)}}
+
+        {% if subitems %}
+          {% set nextlevel = level + 1  | int %}
+          {{ navlist(subitems, level = nextlevel, nav_open=nav_state, parent_item=item) }}
+        {% endif %}
+
+        {% set subitems = '' %}
+        {% set parent_item = {} %}
+      </li>
+    {% endfor %}
+  </ol>
+{% endmacro %}
+
+{% macro nav_wrapper(settings) %}
+  <div data-wm-nav-main-wrapper class="wm-nav-wrapper wm-nav-wrapper--init {% if settings.desktop %} wm-nav-wrapper--h{% endif %}{% if settings.color %} wm-nav-wrapper--{{ settings.color }}{% endif %} " >
+    <div class="wm-nav-wrapper__inner{% if settings.desktop %} wm-nav-wrapper__inner--h{% endif %}">
+      {{ caller() }}
+    </div>
+  </div>
+{% endmacro %}

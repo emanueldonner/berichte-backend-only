@@ -1,0 +1,74 @@
+{# ---
+# icon(settings) Parameter
+settings: "object"
+  id: "string" # ID des Icons (siehe /look-and-feel/icons/?icon_cat=uiedv)
+  hash: "string" # Random hash, um doppelte id-Attribute zu vermeiden (default: false)
+  title: "string" # Alternativtext (default: false)
+  class: "string" # (optional) frei wählbare Klasse
+  width: "int" # Breite (default: 28)
+  height: "int" # Höhe (default: 28)
+  hidden: "boolean" # In HTML ausblenden (default: false)
+  attributes: "object" # HTML-Attribute (z. B.: width, class,...), frei wählbar
+  content: "object"
+    attributes: "object" # HTML-Attribute (z. B.: class,...), frei wählbar
+
+# icon(settings) Anwendung
+{% from "components/icon/icon.njk" import icon with context %}
+
+{{ icon(settings) }}
+
+# iconText(settings) Parameter
+settings: "object"
+  icon: "object" # siehe icon Parameter
+  style: "string" # zulässige Werte: centered
+
+# iconText(settings) Anwendung
+{% from "components/icon/icon.njk" import iconText with context %}
+
+{% call iconText(settings) %}
+  Text frei wählbar
+{% endcall %}
+--- #}
+
+{% macro icon(settings) %}
+  {% if settings.height %}
+    {% set width = settings.width %}
+    {% set height = settings.height %}
+  {% else %}
+    {% set width = settings.width %}
+    {% set height = settings.width %}
+  {% endif %}
+
+  <svg class="wm-icon {{ settings.class }}" width="{{ width | default('28')}}" height="{{ height | default('28') }}"
+      {%- if settings.hidden %} hidden {%- endif -%}
+      {%- if settings.title %} aria-labelledby="{{ settings.hash }}{{ settings.id }}-title" role="img"
+      {%- else %} aria-hidden="true" focusable="false"
+      {%- endif -%}>
+    {% if settings.title -%}<title id="{{ settings.hash }}{{ settings.id }}-title">{{ settings.title }}</title>{%- endif %}
+      {% set icon_id = '/assets/' + project.version_folder + '/icons/svg/sprite.symbol.svg#' + settings.id %}
+      <use xlink:href="{{ icon_id | url }}"/>
+  </svg>
+{% endmacro %}
+
+{% macro iconText(settings) %}
+  <div
+    class="wm-icon-text {% if settings.style %} wm-icon-text--{{ settings.style }} {% endif %} {% if settings.attributes.class %}{{settings.attributes.class}} {% endif %}"
+    {% for attribute, value in settings.attributes %}
+      {% if attribute !== 'class'%}
+        {{ attribute }}{% if value %}="{{ value }}"{% endif %}
+      {% endif %}
+    {% endfor %}
+  >
+
+    {{ icon(settings.icon | addProperty( "class", "wm-icon-text__icon")) }}
+
+    <div class="wm-icon-text__content {% if settings.content.attributes.class %}{{settings.content.attributes.class}} {% endif %}"
+    {% for attribute, value in settings.content.attributes %}
+      {% if attribute !== 'class'%}
+        {{ attribute }}{% if value %}="{{ value }}"{% endif %}
+      {% endif %}
+    {% endfor %}>
+        {{ caller() }}
+    </div>
+  </div>
+{% endmacro %}

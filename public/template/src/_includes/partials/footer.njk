@@ -1,0 +1,8 @@
+{%- from "components/site/footer/site-footer.njk" import siteFooter with context -%}
+{%- from "components/lists/lists.njk" import list with context -%}
+
+{% call siteFooter() %}
+  {{ list(project.footer) }}
+
+  <small> &copy; {{ project.copyright }}</small>
+{% endcall %}

@@ -1,0 +1,52 @@
+{# ---
+# Parameter
+results: "array" #
+  - title: "string" # Überschrift
+    url: "string" # Link des Suchergebnisses
+    category: "string" # frei wählbare Kategorie
+    text: "string" # frei wählbarer Text
+    children: "array" # erzeugt untergeordnete Ebene
+      - title: "string" # Überschrift
+        url: "string" # Link des Suchergebnisses
+        category: "string" # frei wählbare Kategorie
+        text: "string" # frei wählbarer Text
+
+# Anwendung
+{% from "components/search/search-results.njk" import searchResults with context %}
+
+{{ searchResults(results) }}
+--- #}
+
+{% macro searchResults(results) %}
+  <ol class="wm-search-results">
+    {% for result in results %}
+      {% if result.children %}
+        <li class="wm-search-result">
+          {{ searchResult(result) }}
+
+          {{ searchResults(result.children)}}
+        </li>
+      {% else %}
+        <li class="wm-search-result">
+          {{ searchResult(result) }}
+        </li>
+      {% endif %}
+    {% endfor %}
+  </ol>
+{% endmacro %}
+
+{% macro searchResult(result) %}
+  <h2 class="wm-h3">
+    <a href="{{ result.url }}" class="wm-search-result__link js-wm-search-result-link">
+      {{ result.title }}
+    </a>
+  </h2>
+
+  <p class="wm-u-fw600 js-wm-search-result-category">
+    {{ result.category }}
+  </p>
+
+  <p class="js-wm-search-result-text">
+    {{ result.text }}
+  </p>
+{% endmacro %}

@@ -1,0 +1,19 @@
+---
+layout: base.njk
+stagePresent: true
+---
+
+{% from "components/section/section.njk" import section with context %}
+{% from "components/row/row.njk" import row with context %}
+{% from "components/stage/stage.njk" import stage with context %}
+
+<div {% if not hide_nav %}data-wm-inpage-nav="toggle"{% endif %}>
+
+{% call stage(heading = title ) %}{% endcall %}
+
+    {% call section() %}
+        {% call row() %}
+        {{ content | safe }}
+        {%- endcall -%}
+    {% endcall %}
+</div>

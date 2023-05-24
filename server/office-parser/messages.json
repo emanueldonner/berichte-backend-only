@@ -1,0 +1,82 @@
+[
+    {
+        ref: '9124ddf6-85fb-49ab-b65e-eb97d8219c2b',
+        message: 'Keine „Überschrift 1“ im Dokument',
+        explanation: '„Bitte prüfen Sie, ob die Hauptüberschriften im Dokument die Formatvorlage „Überschrift 1“ verwenden! Wir benötigen korrekt formatierte Hauptüberschriften um die Hauptkapitel der Publikation auslesen zu können. <br>\
+Ein Dokument muss mindestens eine Hauptüberschrift „Überschrift 1“ und mindestens eine Unterüberschrift „Überschrift 2“ beinhalten. Textteile vor der ersten Hauptüberschrift (z. B. ein Inhaltsverzeichnis) werden in der Webversion nicht übernommen.“',
+    },
+    {
+        ref: '7bb6ba5e-0d26-45da-99f7-b8f2335eced0',
+        message: 'Keine „Überschrift 2“ nach einer „Überschrift 1“',
+        explanation: '„Bitte prüfen Sie, ob die Unterüberschriften im Dokument die Formatvorlage „Überschrift 2“ verwenden! Wir benötigen korrekt formatierte Unterüberschriften um die Unterkapitel der Publikation auslesen zu können.\
+Ein Dokument muss mindestens eine Hauptüberschrift „Überschrift 1“ und mindestens eine Unterüberschrift „Überschrift 2“ beinhalten. Textteile vor der ersten Hauptüberschrift (z. B. ein Inhaltsverzeichnis) werden in der Webversion nicht übernommen.“',
+    },
+    {
+        ref: 'bf098725-99c4-484d-aba7-8c1fb6acf744',
+        message: 'Unvollständige Überschriftenabfolge im Dokument',
+        explanation: '„Bitte prüfen Sie, ob die Überschriften im Dokument folgender Vorgabe entsprechen:\
+    • Auf jede „Überschrift 1“ folgt direkt eine „Überschrift 2“ oder ein Kapitelbild und dann eine „Überschrift 2“\
+    • Vor jeder „Überschrift 3“ ist (mit oder ohne Inhalt dazwischen) eine „Überschrift 2“ gesetzt.\
+    • Vor jeder „Überschrift 4“ ist (mit oder ohne Inhalt dazwischen) eine „Überschrift 3“ gesetzt.\
+    • Vor jeder „Überschrift 5“ ist (mit oder ohne Inhalt dazwischen) eine „Überschrift 4“ gesetzt.\
+    • Vor jeder „Überschrift 6“ ist (mit oder ohne Inhalt dazwischen) eine „Überschrift 5“ gesetzt.\
+    • Im Dokument werden keine Überschriften mit höherer Zahl als „Überschrift 6“ verwendet.“',
+    },
+    {
+        ref: '721bb6b3-bcc9-4aeb-a0ba-d382c3d7eab6',
+        message: 'Unbekanntes Element im Dokument',
+        explanation: '„Im Dokument befindet sich ein unbekanntes Element (das kann z. B. ein Bild sein, dass nicht webtauglich ist (wir benötigen Bilder im JPG- oder PNG-Format) oder eine Word-Zeichnung oder ähnliches. \
+Folgende Formatvorlagen und Elemente können verwendet werden (alles andere nicht):\
+Formatvorlagen:\
+• „Standard“, „Textkörper“, „Normal“\
+• „Überschrift 1“, „Überschrift 2“, „Überschrift 3“, ... bis „Überschrift 6“\
+• „stark betont“\
+• „Beschriftung“\
+Elemente:\
+• Titel\
+• Ein Coverbild auf der ersten Seite (verankert an der Seite)\
+• Inhaltsverzeichnis vor der ersten Hauptüberschrift „Überschrift 1“ (wird aber im Web nicht dargestellt sondern dient nur der Navigation im Dokument oder in einem exportierten PDF)\
+• Gewöhnlicher Absatz\
+• Bilder (im Textfluss „mit Text in Zeile“)\
+• Beschriftungen (in der Formatvorlage „Beschriftung“)\
+• Links\
+• Aufzählungen (aber keine „Listen mit mehreren Ebenen“)\
+• Nummerierungen\
+• Tabellen\
+• Fußnoten (aber keine Endnoten)\
+',
+    },
+    {
+        ref: 'ded645d1-ce99-4e2a-8833-de414864e97a',
+        message: 'Formatierung oder unbekanntes Element in Überschrift',
+        explanation: '„Bitte formatieren Sie Überschriften nur mit den Formatvorlagen „Überschrift 1“, „Überschrift 2“ etc. bis „Überschrift 6“.\
+Verwenden Sie bitte in Überschriften keine zusätzlichen Formatierungen wie „fett“ oder „kursiv“ und keine zusätzlichen Elemente wie z.B. Links oder Fußnoten!“',
+    },
+    {
+        ref: '4a0f63a2-53dc-4066-bd12-b0446532a34a',
+        message: 'Bild nicht „mit Text in Zeile“',
+        explanation: '„Bitte kontrollieren, ob alle Bilder – ausgenommen das Coverbild – in der Form „mit Text in Zeile“ eingebunden sind (z.B. in Word via Rechtklick auf Bild: Kontextmenü „Größe und Position“ > „Textumbruch“ > „mit Text in Zeile“).\
+Für die Umwandlung in HTML für die Webversion dürfen Bilder nicht am Seitenrand oder Absatz verankert sein, sondern müssen im direkt im Textfluss verankert sein.“',
+    },
+    {
+        ref: '19ceb7c1-685d-4b0c-8948-f4a741154ba8',
+        message: 'Bild nicht in Absatz "Standard" oder "Textkörper"',
+        explanation: '„Bitte kontrollieren, ob sich alle Bilder in einem Absatz mit dem Format „Standard“ oder „Textkörper“ befinden und nicht etwa in einem Absatz der z. B. als Überschrift („Überschrift 1“, Überschrift 2“ etc.) formatiert. \
+Ändern Sie bitte nötigenfalls die Formatvorlage für den Absatz, in dem sich das Bild befindet, in „Standard“ oder „Textkörper“.',
+    },
+    
+    {
+        ref: '9062face-4cb7-4861-bfaf-a07238997e0f',
+        message: 'Keine „Überschrift 2“ direkt nach Überschrift 1',
+        explanation: '„Bitte prüfen Sie, ob die Überschriften im Dokument folgender Vorgabe entsprechen:\
+• Auf jede „Überschrift 1“ folgt direkt eine „Überschrift 2“ oder ein Kapitelbild und dann eine „Überschrift 2“',
+    },
+    
+    {
+        ref: '165c18d0-7fee-4353-a6b1-4cacaa7575c7',
+        message: 'Leere Absätze  gefunden',
+        explanation: '„Bitte verwenden Sie, insbesondere nach Überschriften, keine leeren Absätze!\
+Die Formatvorlagen für die Überschriften („Überschrift 1“, „Überschrift 2“ sind in der Wordvorlage so gestaltet, dass zusätzlich manuell eingefügte Absätze nicht notwendig sind.“',
+    },
+]
+ 

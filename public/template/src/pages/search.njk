@@ -1,0 +1,25 @@
+---
+layout: false
+permalink: search.json
+eleventyExcludeFromCollections: true
+---
+{% set comma = false %}
+{
+"pages": [
+{%- for entry in collections.all -%}
+{%- if not entry.data.excludeFromSearch -%}
+{%- if comma == true-%},
+{%- endif -%}
+{% set comma = true %}
+{
+"tp": "page",
+"t": "{{ entry.data.title }}",
+{%- if entry.data.description -%}"txt": "{{ entry.data.description | striptags }}",{%- endif -%}
+{%- if entry.data.keywords -%}"k": "{{ entry.data.keywords }}",{%- endif -%}
+{%- if entry.templateContent -%}"c": "{{ entry.templateContent | safe | striptags | cleanText }}",{%- endif -%}
+"u": "{{ entry.url | url }}"
+}
+{%- endif -%}
+{%- endfor -%}
+]
+}

@@ -1,0 +1,50 @@
+---
+title: Suchergebnisse
+permalink: /suche/index.html
+layout: base.njk
+items:
+  - text: 'Weniger Seiten zeigen'
+    icon: chevron-left
+    url: '#'
+  - text: 'Mehr Seiten zeigen'
+    icon: chevron-right
+    url: '#'
+hide_nav: true
+excludeFromSearch: true
+---
+{% from "components/search/search-results.njk" import searchResults, searchResult with context %}
+{% from "components/pagination/pagination.njk" import pagination, paginationItem with context %}
+{% from "components/section/section.njk" import section, row with context %}
+{% from "components/block/block.njk" import block with context %}
+
+{% call section() %}
+<div class="js-wm-search-page">
+    <section class="js-wm-search-no-results" hidden>
+        <p aria-live="assertive">Die Suchanfrage ergab leider keine Ergebnisse.</p>
+    </section>
+
+    <section class="js-wm-search-page-results wm-block" hidden>
+        <p aria-live="assertive" class="js-wm-search-page-showing wm-h-vh"></p>
+
+        {{ pagination(items = items, attributes = { hidden: 'hidden'}) }}
+
+        {% call row(richText=false) %}
+            {{ searchResults() }}
+        {% endcall %}
+
+        {% call block('large') %}
+            {{ pagination(items = items, attributes = { hidden: 'hidden'}) }}
+        {% endcall %}
+
+        <template id="searchResult">
+        <li class="wm-search-result">
+            {{ searchResult() }}
+        </li>
+        </template>
+
+        <template id="paginationItem">
+            {{ paginationItem('Seite') }}
+        </template>
+    </section>
+</div>
+{% endcall %}

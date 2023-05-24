@@ -1,0 +1,49 @@
+{# ---
+# Parameter map(settings)
+settings: "object"
+  description: "string" # Beschreibung in Marker Pop-Up
+  id:  "string" # ID der Map
+  zoom:  "int" # Zoomstufe
+  dragging: "boolean" # Ob Karte mittels mouse/touch verschiebbar ist
+  tap: "boolean" # Enables mobile hacks for supporting instant taps (fixing 200ms click delay on iOS/Android) and touch holds (fired as contextmenu events).
+  center: "object" # Mittelpunkt der Map
+    latitude: "int"# Breitengrad
+    longitude: "int" # Längengrad
+  icon: "object"
+    url: "string" # Pfad des verwendeten Icons (vorläufig: "/assets_handbuch/icons/temp_map_icon.png")
+    size: "object" #
+      width: "int" # Breite des Icons
+      height: "int" # Höhe des Icons
+
+# Anwendung
+## Die Javascript-Datei "map.js" muss eingebunden sein
+## Die CSS-Datei "leaflet.css" muss eingebunden sein
+
+{% from "components/map/map.njk" import map with context %}
+
+{{ map(settings) }}
+--- #}
+
+{% macro map(settings) %}
+  <div id="{{ settings.id }}" class="wm-map">
+    {# Text displayed if browser doesn not support map.js #}
+    <p class="wm-u-dn wm-u-db--no-js wm-u-db--legacyjs">
+      Dieses Pattern wird von diesem Browser nicht mehr unterstützt. Bitte folgen Sie diesem Link zum <a href="https://m.wien.gv.at/stadtplan/#base=karte">Wiener Stadtplan</a>.
+    </p>
+  </div>
+
+  <script type="module">
+    import { wmMap } from "{{ '/assets/' + project.version_folder + '/js/components/map' | ext('js') }}";
+
+    wmMap('{{settings.id}}', [{{settings.center.latitude}}, {{settings.center.longitude}}], {{settings.zoom}}, {{settings.dragging}}, {{settings.tap}}).then(function(map) {
+      {% if settings.icon %}
+        var pin = L.icon({
+            iconUrl: '{{settings.icon.url}}',
+            iconSize: [{{settings.icon.size.width}}, {{settings.icon.size.height}}]
+        });
+
+        L.marker([{{settings.center.latitude}}, {{settings.center.longitude}}],{icon: pin}).addTo(map).bindPopup("{{settings.description}}");
+      {% endif %}
+    });
+  </script>
+{% endmacro %}

@@ -1,0 +1,42 @@
+{# ---
+# Parameter
+settings: "object"
+  text: "string" # frei wählbarer Button-Text
+  bold: "boolean" # Text im Button fett darstellen (default: false)
+  mobileOnly: "boolean" # Nur Mobile als toggle darstellen (defaul: false)
+  attributes: "object" # HTML-Attribute (z. B.: class,...), frei wählbar
+
+# Anwendung
+## Die Javascript-Datei "toggle.js" muss eingebunden sein.
+
+{% from "components/toggle/toggle.njk" import toggle with context %}
+
+{% call toggle(settings) %}
+  Inhalt frei wählbar
+{% endcall %}
+--- #}
+
+{% from "components/icon/icon.njk" import icon with context %}
+
+{% macro toggle(settings) %}
+<div class="wm-toggle js-wm-toggle {{ settings.attributes.class }}"
+  {% if settings.mobileOnly %}data-mobile-only="true"{% endif %}
+
+  {% for attribute, value in settings.attributes %}
+    {% if attribute !== 'class'%}
+      {{ attribute }}{% if value %}="{{ value }}"{% endif %}
+    {% endif %}
+  {% endfor %}
+>
+  <div class="wm-toggle__container js-wm-toggle-button {% if settings.bold %}wm-u-fw600{% endif %}">
+    {{ settings.text }}
+    {{ icon({"id":"chevron-down", "hidden":true, "class":"wm-toggle__icon wm-toggle__icon--status"}) }}
+  </div>
+
+  <div class="wm-toggle__panel js-wm-toggle-panel">
+    <div class="wm-toggle__panel-inner">
+      {{ caller() }}
+    </div>
+  </div>
+</div>
+{% endmacro %}

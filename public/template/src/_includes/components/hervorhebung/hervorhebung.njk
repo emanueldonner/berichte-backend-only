@@ -1,0 +1,50 @@
+{# ---
+# Parameter hervorhebung()
+color: "string" # zulässige Werte: morgenrot, flieder, abendstimmung, frischgruen, goldgelb, wasserblau, (default: fastschwarz)
+
+# Anwendung hervorhebung()
+{% from "components/hervorhebung/hervorhebung.njk" import hervorhebung with context %}
+
+{%- call hervorhebung('fastschwarz') -%}
+  Inhalt frei wählbar
+{%- endcall -%}
+
+# Parameter textBackgroundBox()
+color: "string" # zulässige Werte: morgenrot, flieder, abendstimmung, frischgruen, goldgelb, wasserblau, (default: nebelgrau)
+style: "string" # Maximalbreite standardmäßig 35rem, zulässige Werte: full (default: null)
+
+# Anwendung textBackgroundBox()
+{% from "components/hervorhebung/hervorhebung.njk" import textBackgroundBox with context %}
+
+{%- call textBackgroundBox(color='nebelgrau', style = 'full') -%}
+  Inhalt frei wählbar
+{%- endcall -%}
+--- #}
+
+{% macro hervorhebung(color) %}
+ <div class="wm-hervorhebung wm-section{% if color %} wm-hervorhebung--{{ color }} {% endif %}">
+  <div class="wm-section__content">
+    <div class="wm-hervorhebung__content">
+      {{ caller() }}
+    </div>
+  </div>
+</div>
+{% endmacro %}
+
+{% macro textBackgroundBox(color, style) %}
+<div
+  class="wm-text-background
+  {%- if color %} wm-theme-bg--{{ color }} {%- endif -%}
+  {% if style %} wm-text-background--{{ style }} {%- endif -%}">
+  {{ caller() }}
+</div>
+{% endmacro %}
+
+{% macro textBackgroundBanner(theme) %}
+  <div
+    class="wm-text-banner {% if theme %}wm-theme--{{ theme }}{% endif %}">
+    <div class="wm-section__content">
+      {{ caller() }}
+    </div>
+  </div>
+{% endmacro %}

@@ -1,0 +1,19 @@
+<!-- Wenn JavaScript aktiv ist, werden gewisse Basiskomponenten anders dargestellt. Dafür braucht es eine eigene Klasse. -->
+<script>
+  document.documentElement.classList.remove('wm-no-js');
+  document.documentElement.classList.add('wm-js');
+
+  /* Wenn JavaScript Module und damit auch nomodule unterstützt werden, werden gewisse Komponenten anders dargestellt. Dafür braucht es eine weitere Klasse. */
+  if ('noModule' in HTMLScriptElement.prototype) {
+    document.documentElement.classList.add('wm-jsm');
+  }
+
+  // Checken, ob globale Ankündigungen bereits weggeclickt worden sind.
+  if (localStorage.getItem('notification')) {
+    document.documentElement.classList.add('no-notification')
+  }
+</script>
+
+<!-- Polyfills für Internet Explorer 11 -->
+{% set polyfill = '/assets/' + project.version_folder + '/js/polyfill/svgxuse.min.js' %}
+<script src="{{ polyfill | url }}" nomodule async></script>

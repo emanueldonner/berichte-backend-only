@@ -1,0 +1,203 @@
+{# ---
+# Parameter card(raw, size, theme, settings)
+  raw: "boolean" # Mobil kein Schatten und kein Padding
+  size: "string" # Größe (s, m, l, full, expose, expose-reverse)
+  theme: "string" # es kann eine Theme-Farbe übergeben werden (default, morgenrot, goldgelb, flieder, abendstimmung, frischgruen, wasserblau, nebelgrau)
+  settings: "object"
+    attributes: "object" # HTML-Attribute (z. B.: class,...), frei wählbar
+
+# Parameter cardImage(img) # muss innerhalb eines card() Macros aufgerufen werden
+  img: "object" # siehe Pattern "Bilder" -> Parameter und Anwendung
+
+# Parameter cardContent(class) # muss innerhalb eines card() Macros aufgerufen werden
+  class: "string"
+  # Inhalt frei wählbar
+
+# Parameter cardHeading(text, id, class, level, header, url, heading_icon) # muss innerhalb eines card() Macros aufgerufen werden
+  text: "string" # Text frei wählbar
+  id: "string" # ID frei wählbar
+  class: "string" # z.B.: für lange Überschriften kann die class = "wm-u-hyphens" verwendet werden
+  level: "string" # (default: h3) Level der Überschrift (zulässige Werte: h2-h6)
+  header: "boolean" # (default: false) wird in Flipcards verwendet
+  url: "string" # Pfad des Links
+  heading_icon: "object" siehe Pattern "Icon" -> Parameter und Anwendung
+
+  {% call card() %}
+    {{ cardHeading(text, id, class, level, header, url, heading_icon) }}
+    {{ cardImage(image) }}
+    {% call cardContent() %}
+      Inhalt frei wählbar
+    {% endcall %}
+  {% endcall %}
+
+# Parameter cardCanvas(bg, color, position) # muss innerhalb eines card() Macros aufgerufen werden
+  bg: "string" # zulässige Werte: (default: flieder), Farbenauswahl (siehe /look-and-feel/farben/)
+  color: "string" # zulässige Werte: (default: weiss), fastschwarz
+  position: "string" # zulässige Werte: (default: '' (rechts unten)), center, top-left
+
+  {% call card() %}
+    {{ cardHeading(text, url) }}
+    {% call cardCanvas(bg, color, position) %}
+    {% endcall %}
+    {% call cardContent() %}
+      Inhalt frei wählbar
+    {% endcall %}
+  {% endcall %}
+
+# cardFlip()
+  # muss in Verbindung mit cardFlipFront() und cardFlipBack() Macro aufgerufen werden
+
+## cardFlipFront(btn_txt) # muss innerhalb eines cardFlip() Macros aufgerufen werden
+  btn_text: "string" # Text des Buttons frei wählbar (default: Teilen)
+
+## cardFlipBack(btn_txt) # muss innerhalb eines cardFlip() Macros aufgerufen werden
+  btn_text: "string" # Text des Buttons frei wählbar (default: Schließen)
+
+  {% call cardFlip() %}
+    {% call cardFlipFront(btn_txt) %}
+      {{ cardHeading(text, id, class, header) }}
+      Inhalt frei wählbar
+    {% endcall%}
+    {% call cardFlipBack(btn_txt) %}
+      Inhalt frei wählbar
+    {% endcall%}
+  {% endcall %}
+
+# cards(size)
+  size: "string" # zulässige Werte: small, large -> steuert die Größe der angezeigten Cards innerhalb des Grid-Layouts
+
+  {% call cards(size = "small") %}
+    {% call card() %}
+      {% call cardContent() %}
+        {{ cardHeading(text="Überschrift", class="wm-h5") }}
+        {{ cardImage(image) }}
+
+        <p>Text frei wählbar</p>
+      {% endcall %}
+    {% endcall%}
+  {% endcall%}
+
+# Grundsätzlich sollte eine Card semantisch korrekt gegliedert (heading, image, content). Strukturaufbau Card Beispiele:
+
+# 1. positives Beispiel:
+  card:
+  - cardHeading
+  - cardImage
+  - cardContent
+    -- Inhalt
+
+# 1. negatives Beispiel:
+  card:
+  - cardContent
+    -- cardImage
+    -- cardHeading
+    -- Inhalt
+--- #}
+{% from "components/icon/icon.njk" import icon with context %}
+{% from "components/button/button.njk" import button with context %}
+
+{% macro card(raw, size, theme, settings) %}
+  <div class="wm-card{% if raw %} wm-card--raw{% endif %}{% if size %} wm-card--{{ size }}{% endif %}{% if theme %} wm-theme--{{ theme }}{% endif %} {{ settings.class or settings.attributes.class }}" {% for attribute, value in settings.attributes %}
+      {% if attribute !== 'class'%}
+        {{ attribute }}{% if value %}="{{ value }}"{% endif %}
+      {% endif %}
+    {% endfor -%}
+    data-wm-card>
+    {{ caller() }}
+  </div>
+{% endmacro %}
+
+{% macro cardImage(img, class, icon_settings) %}
+  {% from "components/image/image.njk" import image with context %}
+
+  {% set iconAddition = '{"class": "wm-card__icon" }' %}
+
+  <div class="wm-card__media {{ class }}">
+    {{ image(img) }}
+
+    {% if icon_settings %}
+      {{ icon(icon_settings | mergeObject(iconAddition))}}
+    {% endif %}
+
+    {% if img.eyecatcher %}
+      <span class="wm-eyecatcher wm-eyecatcher--{{ img.eyecatcher.type }} wm-theme--{{ img.eyecatcher.color }}">
+        {% if img.eyecatcher.label %}
+          <span class="wm-h-vh">{{ img.eyecatcher.label }}:</span>
+        {% endif %}
+
+        {{ img.eyecatcher.content | safe }}
+      </span>
+    {% endif %}
+  </div>
+{% endmacro %}
+
+{% macro cardContent(class, attributes) %}
+  <div class="wm-card__content wm-rich-text {{ class }}" {% for attribute in attributes %}{{ attribute.name}}="{{ attribute.value}}" {% endfor %}>
+    {{ caller() }}
+  </div>
+{% endmacro %}
+
+{% macro cardHeading(text, id, class, level="h3", header = false, url, heading_icon, link_attributes) %}
+  {% if header  %}
+    <div class="wm-card__header js-wm-card-header">
+  {% endif %}
+
+    <{{ level }}{% if id %} id="{{ id }}" {% endif%} class="wm-card__heading {{ class }}">
+      {% if url %}
+        <a href="{{ url | url }}" class="wm-card__link wm-link--unstyled {{ link_attributes.class }}"
+        {% for attribute in link_attributes %}{{ attribute.name}}="{{ attribute.value}}" {% endfor %}>
+          {% if heading_icon %}
+            {{ icon(heading_icon) }}
+          {% endif %}
+          {{ text }}
+        </a>
+      {% else %}
+        {% if heading_icon %}
+          {{ icon(heading_icon) }}
+        {% endif %}
+        {{ text | safe }}
+      {% endif %}
+    </{{ level }}>
+
+  {% if header %}
+    </div>
+  {% endif %}
+{% endmacro %}
+
+{% macro cardCanvas(bg = 'flieder', color = 'fastschwarz', position) %}
+  <div class="wm-card__canvas wm-card__media wm-theme-bg--{{ bg }}  wm-theme-c--{{ color }} js-wm-block-link">
+    <div class="wm-card__canvas-inner{% if position %} {{ position }}{% endif %}">
+      {{ caller() }}
+    </div>
+  </div>
+{% endmacro %}
+
+{% macro cardFlip(size)%}
+  <div class="wm-flip-card">
+    <div class="wm-card wm-card--flip js-wm-flipcard{% if size %} wm-card--{{ size }}{% endif %}" data-wm-card>
+      <div class="wm-card__content wm-card__content--flip js-wm-card-content">
+        <div class="wm-card__front">
+          {{ caller() }}
+        </div>
+      </div>
+    </div>
+  </div>
+{% endmacro%}
+
+{% macro cardFlipFront(btn_txt) %}
+  <div class="wm-card__side wm-block js-wm-card-side" data-button-text="{{ btn_txt }}">
+    {{ caller() }}
+  </div>
+{% endmacro%}
+
+{% macro cardFlipBack(btn_txt) %}
+  <div class="wm-card__side wm-card__back js-wm-card-side" data-button-text="{{ btn_txt }}" data-button-hidden inert>
+    {{ caller() }}
+  </div>
+{% endmacro%}
+
+{% macro cards(size) %}
+  <div class="wm-grid{% if size %} wm-grid--{{ size}}{% endif %}">
+    {{ caller() }}
+  </div>
+{% endmacro %}

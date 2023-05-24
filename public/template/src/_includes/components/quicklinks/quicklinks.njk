@@ -1,0 +1,77 @@
+{# ---
+# Parameter quicklinks(settings)
+settings: "object"
+  heading: "string" # Überschrift, Text frei wählbar
+  icon_id: "string" # ID des Icons (siehe /look-and-feel/icons/?icon_cat=uiedv) links neben heading angezeigt
+  style: "string" # zulässige Werte: 2col, 3col, 2col-limited
+  dropdown: "object"
+    show: "boolean" # true -> <768px werden Quicklinks als Dropdown (default: false)
+    text: "string" # Text frei wählbar -> angezeigter Text (bei dropdown = true) (default: "Bitte wählen")
+    url: "string" # frei wählbarer Pfad
+  items: "array" # Liste mit Quicklink-Elementen
+    - text: "string" # Text frei wählbar
+      url: "string" # Pfad des Links
+
+# Anwendung
+## Die Javascript-Datei "quicklinks.js" muss eingebunden sein
+
+{% from "components/quicklinks/quicklinks.njk" import quicklinks, quicklinksDropdownSelect with context %}
+
+{% call quicklinks(settings) %}
+{% endcall %}
+--- #}
+
+{% from "components/icon/icon.njk" import icon with context %}
+{% from "components/section/section.njk" import section with context %}
+{% from "components/hervorgehobener-link/hervorgehobener-link.njk" import emLink with context %}
+
+{% macro quicklinks(settings) %}
+  <div class="wm-quicklinks">
+
+    {% if settings.heading %}
+      <h2 class="wm-quicklinks__heading">
+        {% if settings.icon %}
+          {{ icon(settings.icon | addProperty( "class", "wm-quicklinks__icon")) }}
+        {% endif %}
+
+        {{ settings.heading | safe }}
+      </h2>
+    {% endif %}
+
+    {{ caller() }}
+
+    {% if settings.items %}
+      <ul
+        class="wm-quicklinks__items{% if settings.dropdown.show %} wm-quicklinks__items--md{% endif %}{% if settings.style %} wm-quicklinks__items--{{ settings.style }}{% endif %}"
+      >
+        {% for item in settings.items %}
+          <li class="wm-quicklinks__item">
+            {% call emLink(url = item.url , attributes = {"class": 'wm-quicklinks__link'}, block = true) %}
+              {% set text = item.text or item.title or item.data.title %}
+              {{ text | safe  }}
+            {% endcall %}
+          </li>
+        {% endfor %}
+      </ul>
+
+      {% if settings.dropdown.show %}
+        {% call quicklinksDropdownSelect(settings.dropdown) %}
+          {% for item in settings.items %}
+            <option value="{{ item.url }}">
+              {{ item.text | safe }}
+            </option>
+          {% endfor %}
+        {% endcall %}
+      {% endif %}
+
+    {% endif %}
+
+  </div>
+{% endmacro %}
+
+{% macro quicklinksDropdownSelect(settings) %}
+  <select class="wm-quicklinks__dropdown wm-form-item--light js-wm-quicklinks">
+    <option value="{{ settings.url }}">{{ settings.text | default('Bitte wählen') | safe }}</option>
+    {{ caller() }}
+  </select>
+{% endmacro %}

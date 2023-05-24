@@ -1,0 +1,25 @@
+{# ---
+# Parameter logo(link, link_text, lang, width)
+link: "string" # verlinkt das Logo zu dem angegeben Pfad (default: 'https://www.wien.gv.at')
+link_text: "string" # Beschreibung des Links (default: 'Startseite wien.gv.at')
+lang: "string" # Sprache steuert das gezeigt Logo. zulässige Werte: en, de (default: "de")
+width: "int" # Breite des Logos (default: '80')
+
+# Anwendung
+{% from "components/logo/logo.njk" import logo with context %}
+
+{{ logo() }}
+--- #}
+
+{% macro logo(link = 'https://www.wien.gv.at', link_text = 'Startseite wien.gv.at', lang = 'de', width = '80') %}
+  {% if link %}
+    <a class="wm-site-header__logo-link" href="{{ link }}">
+  {% endif %}
+
+  <span class="wm-h-vh">{{ link_text }}</span>
+  {% include "components/logo/logo-" +  lang + ".svg" %}
+
+  {% if link %}
+    </a>
+  {% endif %}
+{% endmacro %}

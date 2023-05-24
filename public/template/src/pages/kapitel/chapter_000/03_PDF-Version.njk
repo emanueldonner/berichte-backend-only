@@ -1,0 +1,17 @@
+---
+title: PDF-Version
+permalink: /{{ page | parentSlug }}/{{ title | strToSlug }}/index.html
+hide_nav: true
+image1:
+  src: /images/image2.jpeg
+  link: /images/image2.jpeg
+  alt: ""
+  attributes:
+    width: 382
+    height: 780
+---
+{% from "components/image/image.njk" import image with context %}
+<p>Die Veröffentlichung des Berichts als PDF-Dokument ist eine häufige Praxis. Sie entspricht aber immer weniger der Erwartungshaltung der Herausgeberschaft. Für die Leser*innen sind sie ohnehin von Nachteil - vor allem am Mobilgerät: längerer Download, der Text viel zu klein. Dazu kommt, dass die PDF-Version vor der Veröffentlichung mit großem Aufwand barrierefrei gemacht werden muss. Dennoch bietet das Berichte-Framework auch die Möglichkeit, auch ein PDF-Dokument automatisch zu erzeugen, etwa für die Archivierung.</p>
+{{ image(image1) }}
+<figcaption>PDF-Dokumente sind auf kleineren Bildschirmen eher schlecht zu konsumieren.</figcaption>
+

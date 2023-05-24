@@ -1,0 +1,35 @@
+{# ---
+# Parameter
+settings: "object"
+  src: "string" # Pfad zum Audio-File
+  label: "string" # Frei wählbares Label (Befüllt das title-Attribut am audio-Element)
+  description: "string" # wenn vorhanden, wird Player in figure + figcaption gerendert
+
+# Anwendung
+{% from "components/media/audio.njk" import audio with context %}
+
+{{ audio(settings) }}
+--- #}
+
+{% from "components/figure/figure.njk" import figure with context %}
+
+{% macro audio(settings) %}
+  {% if settings.description %}
+    {# figure > audio +  figcaption #}
+    {% call figure(media = settings) %}
+      {{ audioWrapper(settings) }}
+    {% endcall%}
+  {% else %}
+    {# simple audio #}
+    {{ audioWrapper(settings) }}
+  {% endif %}
+{% endmacro %}
+
+{% macro audioWrapper(settings) %}
+  <audio src="{{ settings.src }}" controls {% if settings.label %} title="{{ settings.label }}"{% endif %}>
+
+    <a href="{{ settings.src }}" download>
+      {{ settings.label|default  ('Download') }}
+    </a>
+  </audio>
+{% endmacro %}

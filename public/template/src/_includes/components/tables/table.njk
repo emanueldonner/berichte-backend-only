@@ -1,0 +1,73 @@
+{# ---
+# Parameter table(table_content)
+table_content: "object"
+  sortable: "string" # Spalten sortierbar machen, Inhalt: Sprache, z.B. en, default: 'de'
+  zebra: "boolean" # Hintergrundfarbe von Reihen abwechseln (default: false)
+  type: "string" # Zulässige Werte: large (Großzügiger Whitespace + Header mit Hintergrundfarbe), data (kleine Schrift + Header mit Hintergrundfarbe) (default: false)
+  responsive: "boolean" # Bis 1024px Bildschirmbreite nicht als Tabelle darstellen (default: false)
+  scrollable: "boolean" # table bekommt die class "wm-table--overflow"
+  fixed: "array" # Wenn die Spalten fixe Breiten haben sollen. Array von Breitenangaben, zb. [200, 400, 100]
+  caption: "object"
+    text: "string" # wird visuell versteckt angezeigt (Screenreader)
+    id: "string" # auch im attribute aria-labelledby (accessibility)
+  sections: "array" # Liste mit Tabellenelementen
+    - tag: "string" # zulässige Werte: thead, tbody, tfoot
+      rows: "array" # Liste von Reihen innerhalb des tag
+        - tag: "string" # zulässige Werte: th (Header Information), td(Table Daten)
+          color: "string" # einfärben der Row mit class wm-theme-bg--COLOR (table benötigt class wm-table--color)
+          cells: "array" # Liste der im Tag enthaltenen Zellen
+          - label: "string" # Inhalt der Zelle frei wählbar
+            attributes: "object" # größe der jeweiligen Zelle
+              colspan: "int" # Anzahl der Spalten
+              rowspan: "int" # Anzahl der Reihen
+  attributes: "object" # HTML-Attribute (z. B.: class,...), frei wählbar
+    class: "string" # zulässige Werte: wm-table-text, wm-table-responsive, wm-table--overflow, wm-table-data, wm-table--zebra, wm-table--color
+
+# Anwendung
+{% from "components/tables/table.njk" import table with context %}
+
+{{ table(table_content) }}
+--- #}
+
+{% macro table(table_content) %}
+  <div class="{% if table_content.scrollable %}wm-table--overflow{% endif %}{% if table_content.sortable %} wm-table--sortable{% endif %}{% if table_content.zebra %} wm-table--zebra{% endif %}{% if table_content.responsive %} wm-table--responsive js-wm-table-responsive{% endif %}{% if table_content.type %} wm-table--{{ table_content.type }}{% endif %}
+  {{ table_content.attributes.class }}"
+
+  {% for attribute, value in table_content.attributes %}
+    {% if attribute !== 'class' %}
+      {{ attribute }}{% if value %}="{{ value }}"{% endif %}
+    {% endif %}
+  {% endfor %}
+  {% if table_content.sortable %}data-wm-table-sort="{{ table_content.sortable}}"{% endif %}
+
+  {% if table_content.scrollable and table_content.caption.text %} aria-labelledby="{{ table_content.caption.id or table_content.caption.text|strToSlug }}"
+  tabindex="0"
+  role="region"
+  {% endif %}
+  >
+    <span aria-live="polite" class="wm-h-vh"></span>
+    <table {% if table_content.fixed %}class="wm-table--fixed"{% endif %}>
+    {% if table_content.fixed %}
+      <colgroup>
+      {% for width in table_content.fixed %}
+        <col {% if width %}width="{{ width }}px"{% endif %} />
+      {% endfor %}
+      </colgroup>
+    {% endif %}
+      <caption class="wm-h-vh" {% if table_content.caption.text %} id="{{ table_content.caption.id or table_content.caption.text|strToSlug }}" {% endif %}>{{ table_content.caption.text }}</caption>
+      {% for section in table_content.sections %}
+        <{{ section.tag }}>
+            {% for row in section.rows %}
+              <tr {% if row.color %} class="{{row.color}}" {% endif %}>
+              {% for cell in row.cells %}
+                <{{ row.tag }}{% for attribute, value in cell.attributes %} {{ attribute }}{% if value %}="{{ value }}"{% endif %}{% endfor %}>
+                  {{ cell.label | safe }}
+                </{{ row.tag }}>
+              {% endfor %}
+              </tr>
+            {% endfor %}
+        </{{ section.tag }}>
+      {% endfor %}
+    </table>
+  </div>
+{% endmacro %}

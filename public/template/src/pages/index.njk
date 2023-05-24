@@ -1,0 +1,95 @@
+---
+layout: base.njk
+permalink: /index.html
+title: Berichte-Framework wien.gv.at
+stage_image:
+    src: /images_static/stage-s.jpg
+    alt: "Cover-Illustration – Für Wien arbeitende Menschen"
+    not_lazy: true
+    sources:
+        - url: /images_static/stage-m.jpg
+          size: 481
+        - url: /images_static/stage-l.jpg
+          size: 769
+    attributes:
+        width: 480
+        height: 360
+stagePresent: true
+---
+{% from "components/stage/stage.njk" import stage with context %}
+{% from "components/section/section.njk" import section with context %}
+{% from "components/quicklinks/quicklinks.njk" import quicklinks with context %}
+{% from "components/card/card.njk" import cards, card, cardHeading, cardContent, cardImage, cardCanvas with context %}
+{% from "components/nav/tag/nav-tag.njk" import navTag with context %}
+{% from "components/hervorgehobener-link/hervorgehobener-link.njk" import emLink with context %}
+
+{% call stage(heading = project.stage_title, img = stage_image, modifiers = stage_image.modifiers, no_modal = true) %}
+  {{ project.stage_desc }}
+{% endcall %}
+
+{% call section() %}
+  {% if project.indexcards %}
+    {% call cards('large') %}
+      {% for chapter in chapters %}
+        {% call card() %}
+          {% set index = loop.index0 %}
+          {% set chapterStyle = chapters_styles[index] %}
+          {% set i = index %}
+          {% if index < 10 %}
+            {% set i = "00" + index %}
+          {% else %}
+            {% set i = "0" + index %}
+          {% endif %}
+
+          {% if chapter.image or chapterStyle.image %}
+            {% set url = collections["chapter_" + i][0].url %}
+
+            {% set heading = chapter.title | chapterPrefix(index) %}
+
+            {% set image_path = chapter.image or chapterStyle.image %}
+            {% set image_alt = chapter.image_alt or chapterStyle.image_alt %}
+            {% set image_title = chapter.image_title or chapterStyle.image_title %}
+
+            {% if image_title %}
+              {% set image_title = 'copyright: ' + image_title %}
+            {% endif %}
+
+            {{ cardHeading(text = heading, level = 'h2', url = url  | replace('//', '/'), link_attributes = [{"name": "name", "value": chapter.title |slug }] ) }}
+            {{ cardImage({ src: image_path, alt: image_alt, attributes: { width: 545, height: 307, title: image_title } })}}
+          {% else %}
+            {% call cardCanvas(bg = chapterStyle.bg or chapter.bg or 'nebelgrau-light', color = chapterStyle.color or chapter.color) %}
+
+              {% set heading = chapter.title | chapterPrefix(index)  %}
+
+              {{collections["chapter_" + i][0].url|log}}
+              {% set url = collections["chapter_" + i][0].url %}
+              {{ cardHeading(text = heading, level = 'h2', url = url  | replace('//', '/'), link_attributes = [{"name": "name", "value": chapter.title |slug }] ) }}
+            {% endcall %}
+          {% endif %}
+
+          {% call cardContent() %}
+            {% set subchapters = collections["chapter_" + i] | quicklinks(index)  %}
+            {% call quicklinks({items: subchapters}) %}{% endcall %}
+          {% endcall %}
+        {% endcall %}
+      {% endfor %}
+    {% endcall %}
+  {% endif %}
+{% endcall %}
+
+{% call section('highlight') %}
+  {% call cards('large') %}
+    {% call card() %}
+      {{ cardHeading(text = "Fragen zum Framework?", classes="wm-h1" )}}
+
+      {% call cardContent() %}
+        <address>
+        <p><strong>Magistratsabteilung 53<br>Fachbereich Digitales Content Management und Produktentwicklung </strong></p>
+        E-Mail: <a href="mailto:redaktion@wien.gv.at">redaktion@wien.gv.at</a><br>
+        Telefon: <a href="tel:431400081049">+43 1 4000-81049</a><br>
+        <p>
+        </address>
+      {% endcall %}
+    {% endcall %}
+  {% endcall %}
+{% endcall %}

@@ -1,0 +1,60 @@
+{# ---
+# Parameter section(type, attributes)
+type: "string" # zulässige Werte: highlight (mit Hintergrundfarbe), fixed (Maximalhöhe), reduced (margin-bottom: xsmall), intro (margin-bottom: small)
+attributes: "object" # HTML-Attribute (z. B.: class,...), frei wählbar (optional)
+semantic: "boolean" # sections werden als <section> ausgeliefert, außer man setzt den Wert auf false, dann als <div>.
+
+# Anwendung section()
+{% from "components/section/section.njk" import section with context %}
+
+{% call section() %}
+  Inhalt frei wählbar
+{% endcall %}
+
+# Parameter row(richText)
+richText: "boolean" # wm-rich-text Klasse zuweisen
+
+# Anwendung row()
+{% from "components/section/section.njk" import section, row with context %}
+
+{% call section() %}
+  {% call row(true) %}
+    Inhalt frei wählbar
+  {% endcall %}
+{% endcall %}
+--- #}
+{% macro section(type, theme, attributes, semantic = true) %}
+  {% set tag = 'section' %}
+
+  {% if not semantic %}
+    {% set tag = 'div' %}
+  {% endif %}
+
+  <{{ tag }} class="wm-section {{ attributes.class }}{% if type %} wm-section--{{ type }}{% endif %} {% if theme %} wm-theme--{{ theme }}{% endif %}"
+    {%- for attribute, value in attributes -%}
+      {% if attribute !== 'class' %} {{ attribute }}{% if value %}="{{ value }}"{% endif %}{%- endif -%}
+    {%- endfor -%}>
+    <div class="wm-section__content{% if type %} wm-section__content--{{ type }}{% endif %}">
+      {{ caller() }}
+    </div>
+  </{{ tag }}>
+{% endmacro %}
+
+{% macro row(richText = true, layout = false, gap = false) %}
+  <div class="wm-row{% if richText == true %} wm-rich-text{% endif %}{% if gap != false %} wm-row--gap{{ gap }}{% endif %}">
+    {% if layout %}
+      {{ caller() }}
+    {% else %}
+      <div class="wm-block">
+        {{ caller() }}
+      </div>
+    {% endif %}
+  </div>
+{% endmacro %}
+
+{% macro col(class) %}
+  <div class="wm-block {{ class }}">
+    {{ caller() }}
+  </div>
+{% endmacro %}
+
