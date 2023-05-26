@@ -42,9 +42,9 @@ fastify.register(require("./routes/preview"), {
   PUBLIC_DIR,
 })
 
-module.exports = function (fastify, ops, next) {
-  next()
-}
+// module.exports = function (fastify, ops, next) {
+//   next()
+// }
 
 // fastify.register(require("@fastify/http-proxy"), {
 //   upstream: "http://127.0.0.1:8081",
@@ -104,6 +104,8 @@ fastify.listen(
     if (err) {
       fastify.log.error(err)
       process.exit(1)
+    } else {
+      fastify.log.info(`Server listening on ${address}`)
     }
   }
 )
