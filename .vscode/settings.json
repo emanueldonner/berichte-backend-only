@@ -1,0 +1,19 @@
+{
+	"workbench.colorCustomizations": {
+		"[monokai-charcoal]": {
+			"editor.background": "#0e0e11",
+			"sideBar.background": "#0e110f"
+		},
+		"[Default Dark Modern]": {
+			"sideBar.border": "#eeeeee",
+			"panel.border": "#eeeeee",
+			"activityBar.border": "#eeeeee",
+			"sideBarSectionHeader.border": "#eeeeee",
+			"editorGroupHeader.tabsBorder": "#eeeeee",
+			"editorGroup.border": "#eeeeee",
+			"editorGroup.dropBackground": "#eeeeee",
+			"panel.background": "#0a0a0a"
+		}
+	},
+	"prettier.semi": false
+}

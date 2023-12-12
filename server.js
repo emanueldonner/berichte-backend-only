@@ -14,6 +14,7 @@ const envToLogger = {
   production: true,
   test: false,
 }
+
 const fastify = require("fastify")({
   logger: envToLogger["development"] ?? true,
 })
