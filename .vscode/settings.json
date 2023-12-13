@@ -5,13 +5,13 @@
 			"sideBar.background": "#0e110f"
 		},
 		"[Default Dark Modern]": {
-			"sideBar.border": "#eeeeee",
-			"panel.border": "#eeeeee",
-			"activityBar.border": "#eeeeee",
-			"sideBarSectionHeader.border": "#eeeeee",
-			"editorGroupHeader.tabsBorder": "#eeeeee",
-			"editorGroup.border": "#eeeeee",
-			"editorGroup.dropBackground": "#eeeeee",
+			"sideBar.border": "#aaa",
+			"panel.border": "#aaa",
+			"activityBar.border": "#aaa",
+			"sideBarSectionHeader.border": "#aaa",
+			"editorGroupHeader.tabsBorder": "#aaa",
+			"editorGroup.border": "#aaa",
+			"editorGroup.dropBackground": "#aaa",
 			"panel.background": "#0a0a0a"
 		}
 	},
